@@ -1,7 +1,7 @@
 # 기술 스택
 
 - 언어: Java 17
-- 프레임워크: Spring Boot 3.3.x
+- 프레임워크: Spring Boot 4.0.6
 - 빌드 도구: Gradle
 - ORM: Spring Data JPA / Hibernate
 - 데이터베이스:
