@@ -13,4 +13,3 @@
 ## 기준
 
 - Java 17의 현대 문법(Record, Sealed Class, Text Block 등)을 적극 활용한다.
-- Gradle Kotlin DSL 사용을 권장한다.
