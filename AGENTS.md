@@ -90,3 +90,5 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 4. 지금 처리하지 않는 후속 이슈나 아이디어는 `docs/context/backlog.md`에 기록한다.
 5. 검증이 끝나면 `docs/context/progress.md`에 완료 작업과 검증 결과를 기록한다.
 6. 작업을 마치면 변경 내용에 맞는 한글 Conventional Commit 메시지를 추천한다.
+
+코드 변경을 완료하기 전에 `./gradlew check`를 실행한다. 포맷 위반이 있으면 `./gradlew spotlessApply`로 수정한 뒤 다시 검증한다.

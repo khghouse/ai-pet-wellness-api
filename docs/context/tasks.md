@@ -54,3 +54,5 @@
 - [x] 에이전트 완료 흐름 및 IDE 제외 규칙 추가
 - [x] Spring Boot 4.0.6 업그레이드
 - [x] Spring Boot 애플리케이션 진입점 추가
+- [x] Spotless 코드 포맷 검증 추가
+- [x] Java 들여쓰기 4칸 적용

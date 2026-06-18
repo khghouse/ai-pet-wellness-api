@@ -66,6 +66,18 @@
   - 검증: 진입 클래스 추가 전 테스트 실패와 추가 후 성공 확인
   - 검증: `./gradlew check`, `./gradlew build`
   - 관련 문서: `docs/architecture/layers.md`, `docs/conventions/testing.md`
+- Spotless 코드 포맷 검증 추가
+  - 변경: Spotless 8.6.0과 Google Java Format 설정
+  - 변경: 기존 Java 코드에 자동 포맷 적용
+  - 변경: 코딩 컨벤션과 에이전트 검증 명령 갱신
+  - 검증: 기존 코드의 포맷 위반 검출 후 `spotlessApply` 적용 확인
+  - 검증: `./gradlew spotlessCheck`, `./gradlew check`, `./gradlew check --dry-run`
+  - 관련 문서: `docs/conventions/coding.md`, `AGENTS.md`
+- Java 들여쓰기 4칸 적용
+  - 변경: Google Java Format AOSP 스타일 적용
+  - 변경: 코딩 컨벤션에 스페이스 4칸 들여쓰기 명시
+  - 검증: `./gradlew spotlessApply`, `./gradlew check`
+  - 관련 문서: `docs/conventions/coding.md`
 
 ### 검증
 
@@ -87,14 +99,24 @@
 - `./gradlew build`
   - 결과: 성공
   - 목적: main class 해석, 실행 가능한 Spring Boot JAR 생성, 전체 빌드 검증
+- `./gradlew spotlessCheck`
+  - 결과: 성공
+  - 목적: Java 코드 포맷 검증
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 테스트와 Spotless 포맷 검사의 통합 검증
+- `./gradlew check --dry-run`
+  - 결과: 성공
+  - 목적: `spotlessCheck`가 `check` 생명주기에 연결됐는지 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: AOSP 스타일의 스페이스 4칸 들여쓰기 및 전체 검증
 - `./gradlew build`
   - 결과: 실패
   - 목적: 전체 빌드 생명주기 확인
   - 참고: 애플리케이션 진입 클래스가 없어 `bootJar`가 main class를 찾지 못함
 
 ### 인수인계 메모
-
-- 첫 애플리케이션 구성 시 `@SpringBootApplication` 진입 클래스를 추가하고 `./gradlew build`를 다시 검증한다.
 
 ## 2026-06-17
 

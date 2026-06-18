@@ -9,6 +9,14 @@
 - 생성자 주입을 원칙으로 하며 필드 주입은 사용하지 않는다.
 - Lombok은 `@Data` 대신 필요한 어노테이션만 선택적으로 사용한다.
 
+## 코드 포맷
+
+- Java 코드는 Spotless와 Google Java Format의 AOSP 스타일을 사용한다.
+- 들여쓰기는 탭 문자 대신 스페이스 4칸을 사용한다.
+- 포맷 검사는 `./gradlew spotlessCheck`로 실행한다.
+- 포맷 자동 수정은 `./gradlew spotlessApply`로 실행한다.
+- 작업 완료 전 `./gradlew check`를 실행하여 테스트와 포맷 검사를 함께 검증한다.
+
 ## Controller
 
 - 반환 타입은 반드시 `ApiResponse<T>`를 사용한다.
