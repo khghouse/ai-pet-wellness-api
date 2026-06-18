@@ -26,15 +26,6 @@
 
 ## P1 — 높음
 
-- **Spring Boot 애플리케이션 진입점 추가**
-  - **출처:** AI
-  - **문제:** 현재 소스가 없어 `bootJar`가 main class를 찾지 못하므로 `./gradlew build`가 실패한다.
-  - **제안:** 첫 애플리케이션 구성 시 `@SpringBootApplication` 진입 클래스를 추가하고 `./gradlew build`를 검증한다.
-  - **영향:** 실행 가능한 Spring Boot JAR 생성과 전체 빌드 검증이 가능해진다.
-  - **트레이드오프:** 기능 구현 전에 빈 진입 클래스만 추가할 수도 있지만, 이번 작업은 `build.gradle` 구성으로 범위를 제한한다.
-  - **참고:**
-    - `build.gradle`
-
 ## P2 — 보통
 
 ## P3 — 낮음

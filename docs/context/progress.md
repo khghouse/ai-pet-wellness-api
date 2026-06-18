@@ -60,6 +60,12 @@
   - 변경: 기술 스택 문서 갱신 및 ADR 추가
   - 검증: `./gradlew check`, `./gradlew dependencies --configuration runtimeClasspath`
   - 관련 문서: `docs/architecture/tech-stack.md`, `docs/adr/0002-use-spring-boot-4.md`
+- Spring Boot 애플리케이션 진입점 추가
+  - 변경: `io.github.khghouse.petwellness.PetWellnessApplication` 추가
+  - 변경: Spring 애플리케이션 컨텍스트 로딩 테스트 추가
+  - 검증: 진입 클래스 추가 전 테스트 실패와 추가 후 성공 확인
+  - 검증: `./gradlew check`, `./gradlew build`
+  - 관련 문서: `docs/architecture/layers.md`, `docs/conventions/testing.md`
 
 ### 검증
 
@@ -75,6 +81,12 @@
 - `./gradlew dependencies --configuration runtimeClasspath`
   - 결과: 성공
   - 목적: Spring Boot 4.0.6 및 변경된 Web MVC starter 의존성 해석 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 애플리케이션 진입점과 컨텍스트 로딩 테스트 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: main class 해석, 실행 가능한 Spring Boot JAR 생성, 전체 빌드 검증
 - `./gradlew build`
   - 결과: 실패
   - 목적: 전체 빌드 생명주기 확인

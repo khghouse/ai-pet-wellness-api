@@ -53,3 +53,4 @@
 - [x] 기술 스택 기반 Gradle 빌드 구성
 - [x] 에이전트 완료 흐름 및 IDE 제외 규칙 추가
 - [x] Spring Boot 4.0.6 업그레이드
+- [x] Spring Boot 애플리케이션 진입점 추가
