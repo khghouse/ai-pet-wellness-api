@@ -89,3 +89,4 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
    - 되돌리기 어렵거나 여러 기능에 영향을 주는 기술 선택
 4. 지금 처리하지 않는 후속 이슈나 아이디어는 `docs/context/backlog.md`에 기록한다.
 5. 검증이 끝나면 `docs/context/progress.md`에 완료 작업과 검증 결과를 기록한다.
+6. 작업을 마치면 변경 내용에 맞는 한글 Conventional Commit 메시지를 추천한다.
