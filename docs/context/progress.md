@@ -78,6 +78,12 @@
   - 변경: 코딩 컨벤션에 스페이스 4칸 들여쓰기 명시
   - 검증: `./gradlew spotlessApply`, `./gradlew check`
   - 관련 문서: `docs/conventions/coding.md`
+- AI 에이전트 Git 작업 승인 흐름 명시
+  - 변경: 작업 브랜치 생성부터 빌드 검증까지 AI의 기본 수행 범위로 정의
+  - 변경: 커밋, push, PR 생성은 사용자 승인 후 수행하도록 경계 명시
+  - 변경: PR 최종 확인과 merge는 사용자가 담당하도록 명시
+  - 검증: `git diff --check`, `./gradlew build`
+  - 관련 문서: `AGENTS.md`
 
 ### 검증
 
