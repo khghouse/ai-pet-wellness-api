@@ -41,6 +41,31 @@
 
 ---
 
+## 2026-07-01
+
+### 완료
+
+- CI GitHub Packages 인증 설정 개선
+  - 변경: GitHub Actions에서 `COMMON_MODULES_TOKEN` Secret을 `GITHUB_PACKAGES_TOKEN` 환경 변수로 전달
+  - 변경: Gradle GitHub Packages 인증 정보에서 `GITHUB_PACKAGES_TOKEN`을 기본 `GITHUB_TOKEN`보다 우선 사용하도록 조정
+  - 검증: `./gradlew build`, `git diff --check`, GitHub Actions 워크플로 YAML 파싱
+
+### 검증
+
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: private GitHub Packages 의존성 해석과 전체 빌드 검증
+- `git diff --check`
+  - 결과: 성공
+  - 목적: 공백 오류 확인
+- `ruby -e "require 'yaml'; YAML.load_file('.github/workflows/ci.yml'); puts 'workflow yaml ok'"`
+  - 결과: 성공
+  - 목적: GitHub Actions 워크플로 YAML 문법 확인
+
+### 인수인계 메모
+
+- `ai-pet-wellness-api` 저장소의 Actions Secret에 `COMMON_MODULES_TOKEN`이 등록되어 있어야 CI에서 private `common-modules` 패키지를 내려받을 수 있다.
+
 ## 2026-06-21
 
 ### 완료

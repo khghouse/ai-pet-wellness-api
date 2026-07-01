@@ -39,5 +39,6 @@ jobs:
 
       - name: 빌드 및 검증
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.COMMON_MODULES_TOKEN }}
         run: ./gradlew build

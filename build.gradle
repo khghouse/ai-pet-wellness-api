@@ -26,8 +26,8 @@ repositories {
     maven {
         url = uri('https://maven.pkg.github.com/khghouse/common-modules')
         credentials {
-            username = findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR') ?: System.getenv('GITHUB_USERNAME')
-            password = findProperty('gpr.key') ?: System.getenv('GITHUB_TOKEN') ?: System.getenv('GITHUB_PACKAGES_TOKEN')
+            username = findProperty('gpr.user') ?: System.getenv('GITHUB_USERNAME') ?: System.getenv('GITHUB_ACTOR')
+            password = findProperty('gpr.key') ?: System.getenv('GITHUB_PACKAGES_TOKEN') ?: System.getenv('GITHUB_TOKEN')
         }
     }
 }
