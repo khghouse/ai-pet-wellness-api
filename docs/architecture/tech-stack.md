@@ -8,6 +8,10 @@
   - 로컬 / 테스트: H2
   - 개발 / 운영: MySQL 8.x
 - 유틸리티: Lombok
+- 공통 모듈:
+  - `common-web:0.1.0-SNAPSHOT`
+  - `common-logging:0.1.0-SNAPSHOT`
+  - `common-core:0.1.0-SNAPSHOT` (`common-web` 전이 의존성)
 - 테스트: JUnit 5, Mockito, AssertJ
 
 ## 기준

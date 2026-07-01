@@ -28,6 +28,15 @@
 
 ## P2 — 보통
 
+- **common-modules 안정 버전 전환**
+  - **출처:** AI
+  - **문제:** 현재 연동한 `0.1.0-SNAPSHOT`은 동일한 버전 좌표의 artifact가 변경될 수 있어 재현 가능한 빌드를 보장하기 어렵다.
+  - **제안:** `common-modules`의 안정 버전이 배포되면 `common-web`과 `common-logging` 의존성을 해당 버전으로 전환한다.
+  - **영향:** 로컬과 CI에서 동일한 artifact를 사용해 빌드 재현성을 높일 수 있다.
+  - **트레이드오프:** 공통 모듈의 릴리스와 버전 변경을 별도로 관리해야 한다.
+  - **참고:**
+    - https://github.com/khghouse/common-modules
+
 ## P3 — 낮음
 
 ## 나중에 검토

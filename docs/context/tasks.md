@@ -57,3 +57,5 @@
 - [x] Spotless 코드 포맷 검증 추가
 - [x] Java 들여쓰기 4칸 적용
 - [x] AI 에이전트 Git 작업 승인 흐름 명시
+- [x] common-web 및 common-logging 연동
+- [x] CI GitHub Packages 인증 설정 개선

@@ -41,6 +41,74 @@
 
 ---
 
+## 2026-07-01
+
+### 완료
+
+- CI GitHub Packages 인증 설정 개선
+  - 변경: GitHub Actions에서 `COMMON_MODULES_TOKEN` Secret을 `GITHUB_PACKAGES_TOKEN` 환경 변수로 전달
+  - 변경: Gradle GitHub Packages 인증 정보에서 `GITHUB_PACKAGES_TOKEN`을 기본 `GITHUB_TOKEN`보다 우선 사용하도록 조정
+  - 검증: `./gradlew build`, `git diff --check`, GitHub Actions 워크플로 YAML 파싱
+
+### 검증
+
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: private GitHub Packages 의존성 해석과 전체 빌드 검증
+- `git diff --check`
+  - 결과: 성공
+  - 목적: 공백 오류 확인
+- `ruby -e "require 'yaml'; YAML.load_file('.github/workflows/ci.yml'); puts 'workflow yaml ok'"`
+  - 결과: 성공
+  - 목적: GitHub Actions 워크플로 YAML 문법 확인
+
+### 인수인계 메모
+
+- `ai-pet-wellness-api` 저장소의 Actions Secret에 `COMMON_MODULES_TOKEN`이 등록되어 있어야 CI에서 private `common-modules` 패키지를 내려받을 수 있다.
+
+## 2026-06-21
+
+### 완료
+
+- common-web 및 common-logging 연동
+  - 변경: GitHub Packages 저장소와 `common-web:0.1.0-SNAPSHOT`, `common-logging:0.1.0-SNAPSHOT` 의존성 추가
+  - 변경: CI에 `packages: read` 권한과 `GITHUB_TOKEN` 전달 설정 추가
+  - 변경: 공통 웹 및 로깅 AutoConfiguration Bean 등록 통합 테스트 추가
+  - 변경: 공통 모듈 사용 ADR과 기술 스택 갱신
+  - 검증: 공통 모듈 추가 전 통합 테스트 실패와 추가 후 성공 확인
+  - 검증: `common-core:0.1.0-SNAPSHOT` 전이 의존성 포함 확인
+  - 관련 문서: `docs/adr/0003-use-common-modules.md`, `docs/architecture/tech-stack.md`
+
+### 검증
+
+- `./gradlew test --tests io.github.khghouse.petwellness.CommonModulesAutoConfigurationTest`
+  - 결과: 의존성 추가 전 실패, 추가 후 성공
+  - 목적: 공통 웹 및 로깅 자동 설정 Bean 등록 확인
+- `./gradlew dependencyInsight --dependency common-web --configuration runtimeClasspath`
+  - 결과: 성공
+  - 목적: `common-web:0.1.0-SNAPSHOT` 의존성 해석 확인
+- `./gradlew dependencyInsight --dependency common-logging --configuration runtimeClasspath`
+  - 결과: 성공
+  - 목적: `common-logging:0.1.0-SNAPSHOT` 의존성 해석 확인
+- `./gradlew dependencyInsight --dependency common-core --configuration runtimeClasspath`
+  - 결과: 성공
+  - 목적: `common-web`을 통한 `common-core:0.1.0-SNAPSHOT` 전이 의존성 확인
+- `./gradlew spotlessApply`
+  - 결과: 성공
+  - 목적: 새 통합 테스트 코드 포맷 적용
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 테스트와 코드 포맷을 포함한 전체 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: 실행 가능한 Spring Boot JAR을 포함한 전체 빌드 검증
+
+### 인수인계 메모
+
+- private GitHub Package를 CI에서 내려받으려면 `common-modules` 패키지 설정에서 이 저장소에 Actions 읽기 권한을 부여해야 한다.
+- `0.1.0-SNAPSHOT`의 안정 버전 전환 작업은 `docs/context/backlog.md`에서 관리한다.
+- `common-auth`는 회원과 인증 요구사항을 확정한 뒤 별도 작업으로 연동한다.
+
 ## 2026-06-18
 
 ### 완료

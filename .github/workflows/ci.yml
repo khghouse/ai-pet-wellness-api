@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -37,4 +38,7 @@ jobs:
           cache-provider: basic
 
       - name: 빌드 및 검증
+        env:
+          GITHUB_USERNAME: ${{ github.repository_owner }}
+          GITHUB_PACKAGES_TOKEN: ${{ secrets.COMMON_MODULES_TOKEN }}
         run: ./gradlew build
