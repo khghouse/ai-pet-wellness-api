@@ -41,6 +41,40 @@
 
 ---
 
+## 2026-07-02
+
+### 완료
+
+- REQ-001 회원 가입 구현
+  - 변경: 이메일과 비밀번호 기반 회원 가입 API 추가
+  - 변경: `Member`, `MemberStatus`, `BaseEntity`, `MemberRepository`, `MemberService` 추가
+  - 변경: Controller용 `MemberSignupRequest`와 Service용 `MemberSignupServiceRequest` 분리
+  - 변경: `spring-security-crypto` 기반 `PasswordEncoder` 설정 추가
+  - 변경: 회원 가입 Controller 슬라이스 테스트와 서비스 통합 테스트 추가
+  - 변경: 기술 스택 문서에 비밀번호 해싱 및 Boot 4 Web MVC 테스트 모듈 반영
+  - 검증: 테스트를 먼저 작성해 컴파일 실패를 확인한 뒤 구현 후 성공 확인
+  - 관련 문서: `docs/requirements.md`, `docs/architecture/tech-stack.md`
+
+### 검증
+
+- `./gradlew test --tests '*MemberServiceTest' --tests '*MemberControllerTest'`
+  - 결과: 구현 전 실패, 구현 후 성공
+  - 목적: 회원 가입 성공, 비밀번호 해싱, 이메일 중복, 입력값 검증 확인
+- `./gradlew spotlessApply`
+  - 결과: 성공
+  - 목적: Java 코드 포맷 적용
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 테스트와 포맷 검사를 포함한 전체 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: 실행 가능한 Spring Boot JAR을 포함한 전체 빌드 검증
+
+### 인수인계 메모
+
+- Spring Boot 4에서는 Controller 슬라이스 테스트를 위해 `spring-boot-webmvc-test` 테스트 의존성을 명시했다.
+- 로그인, JWT 발급, 소셜 로그인, 이메일 인증, 비밀번호 재설정은 REQ-001 범위에서 제외했다.
+
 ## 2026-07-01
 
 ### 완료

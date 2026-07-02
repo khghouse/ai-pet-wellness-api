@@ -5,7 +5,8 @@
 - 기본 작성 대상은 Controller 슬라이스 테스트, Service 통합 테스트, Repository 슬라이스 테스트다.
 - Service 레이어는 `IntegrationTestSupport`를 상속하여 실제 DB와 연동한 테스트를 작성한다.
 - `domain/.../service/*Test`는 Service와 Repository를 함께 사용하는 통합 테스트를 작성한다.
-- `integration/*Test`는 `MockMvc` 기반으로 HTTP 요청부터 Controller, Service, Repository까지 관통하는 전체 플로우를 검증한다.
+- `integration/*Test`는 사용자가 명시적으로 요청한 경우에만 작성한다.
+- 사용자가 통합 테스트를 요청한 경우 `MockMvc` 기반으로 HTTP 요청부터 Controller, Service, Repository까지 관통하는 전체 플로우를 검증한다.
 - Mock 기반 단위 테스트는 기본 선택지가 아니다.
 - 테스트 픽스처는 별도 `fixture` 패키지 또는 `TestFixture` 클래스로 분리한다.
 - 하나의 테스트 메서드에서는 하나의 동작만 검증한다.
@@ -36,7 +37,7 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 │       └── entity/
 │           └── {도메인명}Test.java
 └── integration/
-    └── {도메인명}IntegrationTest.java
+    └── {도메인명}IntegrationTest.java  # 명시 요청 시에만 작성
 ```
 
 ## Support 클래스 기준
@@ -44,7 +45,7 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 | 클래스 | 용도 |
 |---|---|
 | `ControllerTestSupport` | Spring Security 포함 Controller 슬라이스 테스트 |
-| `IntegrationTestSupport` | Service + Repository 실제 연동 테스트 및 MockMvc 기반 전체 플로우 통합 테스트 |
+| `IntegrationTestSupport` | Service + Repository 실제 연동 테스트 및 명시 요청된 MockMvc 기반 전체 플로우 통합 테스트 |
 | `RepositoryTestSupport` | JPA / Querydsl Repository 슬라이스 테스트 |
 
 ### IntegrationTestSupport
@@ -53,7 +54,8 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 - 부모 클래스에 `@Transactional`을 선언하지 않는다.
 - 자식 테스트 클래스에서 `@Transactional`을 명시한다.
 - Service 테스트에서는 실제 Service와 Repository 연동을 검증한다.
-- `integration` 패키지 테스트에서는 `@AutoConfigureMockMvc`를 추가하여 HTTP 요청부터 Controller, Service, Repository까지 전체 애플리케이션 플로우를 검증한다.
+- `integration` 패키지 테스트는 사용자가 명시적으로 요청한 경우에만 작성한다.
+- 명시 요청된 `integration` 패키지 테스트에서는 `@AutoConfigureMockMvc`를 추가하여 HTTP 요청부터 Controller, Service, Repository까지 전체 애플리케이션 플로우를 검증한다.
 
 ### RepositoryTestSupport
 
