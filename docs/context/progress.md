@@ -45,6 +45,29 @@
 
 ### 완료
 
+- Flyway DB 마이그레이션 도구 추가
+  - 변경: Flyway 및 MySQL 지원 의존성 추가
+  - 변경: Spring Boot 4 Flyway 통합 모듈 추가
+  - 변경: 회원 테이블 초기 마이그레이션 SQL 추가
+  - 변경: 테스트 프로필의 JPA 스키마 전략을 `validate`로 변경
+  - 변경: 기술 스택과 ADR 문서 갱신
+  - 검증: 회원 서비스 테스트에서 Flyway 마이그레이션 후 Hibernate 스키마 검증이 통과하는지 확인
+
+### 검증
+
+- `./gradlew test --tests '*MemberServiceTest'`
+  - 결과: 구현 전 실패, 구현 후 성공
+  - 목적: Flyway 마이그레이션과 JPA 스키마 검증 연동 확인
+
+### 인수인계 메모
+
+- Spring Boot 4에서는 Flyway 자동 구성을 위해 `spring-boot-flyway` 모듈을 명시한다.
+- 새 스키마 변경은 기존 마이그레이션 파일을 수정하지 않고 새 `V{버전}__{설명}.sql` 파일로 추가한다.
+
+## 2026-07-08
+
+### 완료
+
 - REST Docs 하네스 추가
   - 변경: Spring REST Docs MockMvc 의존성과 Asciidoctor Gradle 플러그인 추가
   - 변경: `RestDocsSupport` 추가
