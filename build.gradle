@@ -4,6 +4,7 @@ plugins {
     id 'org.springframework.boot' version '4.0.6'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '8.6.0'
+    id 'org.asciidoctor.jvm.convert' version '4.0.5'
 }
 
 group = 'io.github.khghouse'
@@ -19,6 +20,10 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 repositories {
@@ -51,11 +56,26 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-webmvc-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+tasks.named('asciidoctor') {
+    inputs.dir snippetsDir
+    attributes 'snippets': snippetsDir
+    dependsOn test
+}
+
+tasks.named('bootJar') {
+    dependsOn asciidoctor
+    from("${tasks.named('asciidoctor').get().outputDir}") {
+        into 'static/docs'
+    }
 }
 
 spotless {

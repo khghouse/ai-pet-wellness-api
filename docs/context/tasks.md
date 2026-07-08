@@ -60,3 +60,4 @@
 - [x] CI GitHub Packages 인증 설정 개선
 - [x] REQ-001 회원 가입 구현
 - [x] 테스트 하네스 Support 클래스 및 테스트 프로필 정리
+- [x] REST Docs 하네스 추가

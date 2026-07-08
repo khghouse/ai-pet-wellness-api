@@ -1,0 +1,14 @@
+== Overview
+
+반려동물 건강관리 백엔드 API 문서입니다.
+
+=== Common Response
+
+[source,json]
+----
+{
+  "status": 200,
+  "success": true,
+  "data": {}
+}
+----

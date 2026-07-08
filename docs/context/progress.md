@@ -45,6 +45,42 @@
 
 ### 완료
 
+- REST Docs 하네스 추가
+  - 변경: Spring REST Docs MockMvc 의존성과 Asciidoctor Gradle 플러그인 추가
+  - 변경: `RestDocsSupport` 추가
+  - 변경: 회원 가입 API REST Docs 테스트 추가
+  - 변경: AsciiDoc 진입점과 회원 API 문서 섹션 추가
+  - 변경: `bootJar`에 생성된 HTML 문서를 `static/docs`로 포함하도록 설정
+  - 변경: 기술 스택과 REST Docs 규칙 문서 갱신
+  - 검증: 회원 가입 API 문서 snippet 생성과 Asciidoctor HTML 생성 확인
+
+### 검증
+
+- `./gradlew test --tests '*MemberControllerDocsTest'`
+  - 결과: 구현 전 실패, 구현 후 성공
+  - 목적: REST Docs 의존성, Support 설정, 회원 가입 API snippet 생성 확인
+- `./gradlew asciidoctor`
+  - 결과: 성공
+  - 목적: 생성된 snippet을 AsciiDoc HTML 문서로 조합하는지 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 테스트와 포맷 검사를 포함한 전체 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+- `jar tf build/libs/pet-wellness-1.0-SNAPSHOT.jar | grep 'docs'`
+  - 결과: 성공
+  - 목적: 생성된 HTML 문서가 `static/docs` 경로로 JAR에 포함되는지 확인
+
+### 인수인계 메모
+
+- Spring REST Docs 4의 Asciidoctor 확장과 AsciidoctorJ 조합에서 `operation::` 매크로 호환 문제가 있어 개별 snippet `include::` 방식으로 문서를 구성한다.
+- REST Docs 테스트는 `@WebMvcTest`가 아닌 standalone MockMvc 기반 `RestDocsSupport`를 상속한다.
+
+## 2026-07-08
+
+### 완료
+
 - 테스트 하네스 Support 클래스 및 테스트 프로필 정리
   - 변경: `ControllerTestSupport`, `IntegrationTestSupport`, `RepositoryTestSupport` 추가
   - 변경: 회원 Controller 테스트와 회원 Service 테스트가 공통 Support를 상속하도록 정리

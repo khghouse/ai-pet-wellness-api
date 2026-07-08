@@ -1,0 +1,19 @@
+== Member
+
+=== 회원 가입
+
+==== HTTP request
+
+include::{snippets}/member-controller-docs-test/signup_valid-request_generates-rest-docs/http-request.adoc[]
+
+==== Request fields
+
+include::{snippets}/member-controller-docs-test/signup_valid-request_generates-rest-docs/request-fields.adoc[]
+
+==== HTTP response
+
+include::{snippets}/member-controller-docs-test/signup_valid-request_generates-rest-docs/http-response.adoc[]
+
+==== Response fields
+
+include::{snippets}/member-controller-docs-test/signup_valid-request_generates-rest-docs/response-fields.adoc[]
