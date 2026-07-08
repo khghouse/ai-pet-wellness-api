@@ -8,6 +8,7 @@
 - `null` 반환을 지양하고 `Optional`을 적절히 활용한다.
 - 생성자 주입을 원칙으로 하며 필드 주입은 사용하지 않는다.
 - Lombok은 `@Data` 대신 필요한 어노테이션만 선택적으로 사용한다.
+- 생성자 주입은 `final` 필드와 Lombok `@RequiredArgsConstructor`를 사용한다.
 
 ## 코드 포맷
 
@@ -45,6 +46,8 @@
 
 - 연관관계 편의 메서드는 연관관계의 주인 쪽에 작성한다.
 - N+1 문제를 주의하고 필요 시 `fetch join` 또는 `@EntityGraph`를 사용한다.
+- Entity와 공통 Entity는 getter 메서드를 직접 작성하지 않고 Lombok `@Getter`를 사용한다.
+- Entity의 기본 생성자는 Lombok `@NoArgsConstructor(access = AccessLevel.PROTECTED)`를 사용한다.
 
 ## JPA 공통 엔티티
 

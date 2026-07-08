@@ -36,7 +36,6 @@
 
 > 현재 집중 중인 작업. 동시에 여러 개를 넣지 않는다.
 
-
 ---
 
 ## 대기 중
@@ -59,3 +58,4 @@
 - [x] AI 에이전트 Git 작업 승인 흐름 명시
 - [x] common-web 및 common-logging 연동
 - [x] CI GitHub Packages 인증 설정 개선
+- [x] REQ-001 회원 가입 구현
