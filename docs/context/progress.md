@@ -41,6 +41,28 @@
 
 ---
 
+## 2026-07-08
+
+### 완료
+
+- 테스트 하네스 Support 클래스 및 테스트 프로필 정리
+  - 변경: `ControllerTestSupport`, `IntegrationTestSupport`, `RepositoryTestSupport` 추가
+  - 변경: 회원 Controller 테스트와 회원 Service 테스트가 공통 Support를 상속하도록 정리
+  - 변경: `application-test.yml`을 추가해 테스트 DB와 JPA 설정을 명시
+  - 변경: Spring Boot 4 Data JPA 테스트 모듈 의존성 추가
+  - 변경: 기술 스택과 작업 기록 문서 갱신
+
+### 검증
+
+- `./gradlew test --tests '*MemberControllerTest' --tests '*MemberServiceTest' --tests '*PetWellnessApplicationTest'`
+  - 결과: 성공
+  - 목적: Support 클래스 분리 후 기존 Controller, Service, 애플리케이션 컨텍스트 테스트 동작 확인
+
+### 인수인계 메모
+
+- Spring Boot 4에서는 Repository 슬라이스 테스트를 위해 `spring-boot-data-jpa-test` 테스트 의존성을 명시했다.
+- `IntegrationTestSupport`는 부모 클래스에 `@Transactional`을 선언하지 않고, 필요한 테스트 클래스에서 직접 선언한다.
+
 ## 2026-07-02
 
 ### 완료
