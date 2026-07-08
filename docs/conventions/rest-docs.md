@@ -18,20 +18,17 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 - `MockMvcBuilders.standaloneSetup(initController())`으로 대상 Controller만 등록한다.
 - 스니펫 경로는 `{class-name}/{method-name}` 패턴을 사용한다.
 - `CharacterEncodingFilter("UTF-8", true)`를 추가한다.
-- `ObjectMapper`는 `JavaTimeModule`과 날짜 직렬화 설정을 포함한 프로젝트 표준 설정을 사용한다.
-- `LocalDateTime`을 포함한 Java Time 타입은 REST Docs 응답 본문에서 배열이 아닌 ISO-8601 문자열로 직렬화되어야 한다.
-- 이를 위해 `RestDocsSupport`의 `ObjectMapper`는 `JavaTimeModule`을 등록하고 `WRITE_DATES_AS_TIMESTAMPS`를 비활성화한 뒤, `MappingJackson2HttpMessageConverter`로 `MockMvc`에 주입한다.
+- Controller Advice는 공통 예외 응답 검증을 위해 `GlobalExceptionHandler`를 등록한다.
+- `ObjectMapper`는 Spring Boot 4의 Jackson 3 환경에 맞춰 `tools.jackson.databind.ObjectMapper`를 사용한다.
 
 #### RestDocsSupport 직렬화 기준
 
 ```java
-protected ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+protected ObjectMapper objectMapper = new ObjectMapper();
 
 this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
+        .setControllerAdvice(new GlobalExceptionHandler())
         .addFilters(new CharacterEncodingFilter("UTF-8", true))
-        .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
         .apply(documentationConfiguration(provider))
         .alwaysDo(document)
         .build();
@@ -60,14 +57,14 @@ this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
 - `src/docs/asciidoc/index.adoc`는 문서 진입점으로만 사용하고, 개별 리소스/공통 문서는 별도 `.adoc` 파일로 분리한다.
 - 기능별 문서는 `src/docs/asciidoc/sections/` 아래에 생성하고, `index.adoc`에서 `include::...[]`로 조합한다.
 - 공통 응답 예시처럼 snippet 의존성이 낮고 고정 포맷이 필요한 내용은 include snippet 대신 하드코딩된 JSON 예시를 사용한다.
+- Spring REST Docs 4 환경에서는 Asciidoctor 확장 호환성을 위해 `operation::` 매크로 대신 개별 snippet `include::`를 사용한다.
 - 문서 파일이 비대해지면 `overview`, `common-response`, `todo`처럼 주제별로 분리하는 것을 기본 원칙으로 한다.
 
 ### index.adoc 구성 원칙
 
 ```adoc
-= Todo API Documentation
+= Pet Wellness API Documentation
 
 include::src/docs/asciidoc/sections/overview.adoc[]
-include::src/docs/asciidoc/sections/common-response.adoc[]
-include::src/docs/asciidoc/sections/todo.adoc[]
+include::src/docs/asciidoc/sections/member.adoc[]
 ```
