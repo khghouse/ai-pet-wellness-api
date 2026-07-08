@@ -10,6 +10,9 @@
 - Mock 기반 단위 테스트는 기본 선택지가 아니다.
 - 테스트 픽스처는 별도 `fixture` 패키지 또는 `TestFixture` 클래스로 분리한다.
 - 하나의 테스트 메서드에서는 하나의 동작만 검증한다.
+- Controller 테스트의 정상 요청, 형식 오류, 정책 오류는 Request DTO와 `ObjectMapper`를 사용해 JSON을 생성한다.
+- Spring Boot 4의 Jackson 3 환경에서는 `tools.jackson.databind.ObjectMapper`를 사용한다.
+- JSON 문법 오류나 필드 누락 자체를 검증하는 테스트는 문자열 JSON을 사용한다.
 - @DisplayName은 메서드명을 반복하지 않고 한글 문장으로 테스트 의도를 설명한다. 형식은 어떤 상황에서 어떤 결과를 반환한다 또는 어떤 조건이면 어떤 예외/응답이 발생한다를 권장한다.
 
 ```java

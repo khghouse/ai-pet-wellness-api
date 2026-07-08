@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.khghouse.common.web.global.exception.GlobalExceptionHandler;
+import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
 import io.github.khghouse.petwellness.domain.member.entity.MemberStatus;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(MemberController.class)
 @Import(GlobalExceptionHandler.class)
@@ -25,24 +27,21 @@ class MemberControllerTest {
 
     @Autowired private MockMvc mockMvc;
 
+    @Autowired private ObjectMapper objectMapper;
+
     @MockitoBean private MemberService memberService;
 
     @DisplayName("정상 입력이면 회원 가입에 성공하고 비밀번호를 응답하지 않는다")
     @Test
     void signup_validRequest_returnsMemberWithoutPassword() throws Exception {
+        MemberSignupRequest request = new MemberSignupRequest("member@example.com", "password1");
         given(memberService.signup(any()))
                 .willReturn(new MemberResponse(1L, "member@example.com", MemberStatus.ACTIVE));
 
         mockMvc.perform(
                         post("/api/v1/members")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                                        {
-                                          "email": "member@example.com",
-                                          "password": "password1"
-                                        }
-                                        """))
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.success").value(true))
@@ -55,16 +54,12 @@ class MemberControllerTest {
     @DisplayName("이메일 형식이 올바르지 않으면 회원 가입에 실패한다")
     @Test
     void signup_invalidEmail_returnsBadRequest() throws Exception {
+        MemberSignupRequest request = new MemberSignupRequest("invalid-email", "password1");
+
         mockMvc.perform(
                         post("/api/v1/members")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                                        {
-                                          "email": "invalid-email",
-                                          "password": "password1"
-                                        }
-                                        """))
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("INVALID_INPUT_VALUE"));
@@ -90,16 +85,12 @@ class MemberControllerTest {
     @DisplayName("비밀번호 정책을 만족하지 않으면 회원 가입에 실패한다")
     @Test
     void signup_invalidPasswordLength_returnsBadRequest() throws Exception {
+        MemberSignupRequest request = new MemberSignupRequest("member@example.com", "short");
+
         mockMvc.perform(
                         post("/api/v1/members")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(
-                                        """
-                                        {
-                                          "email": "member@example.com",
-                                          "password": "short"
-                                        }
-                                        """))
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("INVALID_INPUT_VALUE"));
