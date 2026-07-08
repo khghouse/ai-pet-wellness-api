@@ -8,18 +8,15 @@ import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServ
 import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.exception.MemberErrorCode;
 import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
+import io.github.khghouse.petwellness.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-@ActiveProfiles("test")
-@SpringBootTest
 @Transactional
-class MemberServiceTest {
+class MemberServiceTest extends IntegrationTestSupport {
 
     @Autowired private MemberService memberService;
 

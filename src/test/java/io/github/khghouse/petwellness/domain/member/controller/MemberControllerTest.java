@@ -6,28 +6,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.github.khghouse.common.web.global.exception.GlobalExceptionHandler;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
 import io.github.khghouse.petwellness.domain.member.entity.MemberStatus;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
+import io.github.khghouse.petwellness.support.ControllerTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(MemberController.class)
-@Import(GlobalExceptionHandler.class)
-class MemberControllerTest {
-
-    @Autowired private MockMvc mockMvc;
-
-    @Autowired private ObjectMapper objectMapper;
+class MemberControllerTest extends ControllerTestSupport {
 
     @MockitoBean private MemberService memberService;
 
