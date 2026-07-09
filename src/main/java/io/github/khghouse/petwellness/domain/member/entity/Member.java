@@ -47,4 +47,18 @@ public class Member extends BaseEntity {
     public static Member create(String email, String password) {
         return new Member(email, password);
     }
+
+    public boolean isActive() {
+        return status == MemberStatus.ACTIVE && !deleted;
+    }
+
+    public void deactivate() {
+        this.status = MemberStatus.INACTIVE;
+    }
+
+    public void withdraw() {
+        this.status = MemberStatus.WITHDRAWN;
+        this.deleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

@@ -1,6 +1,8 @@
 package io.github.khghouse.petwellness.domain.member.controller;
 
 import io.github.khghouse.common.web.global.response.ApiResponse;
+import io.github.khghouse.petwellness.domain.member.dto.request.MemberLoginRequest;
+import io.github.khghouse.petwellness.domain.member.dto.request.MemberLoginServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupRequest;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
@@ -22,6 +24,12 @@ public class MemberController {
     @PostMapping
     public ApiResponse<MemberResponse> signup(@Valid @RequestBody MemberSignupRequest request) {
         MemberResponse response = memberService.signup(MemberSignupServiceRequest.from(request));
+        return ApiResponse.<MemberResponse>ok(response);
+    }
+
+    @PostMapping("/login")
+    public ApiResponse<MemberResponse> login(@Valid @RequestBody MemberLoginRequest request) {
+        MemberResponse response = memberService.login(MemberLoginServiceRequest.from(request));
         return ApiResponse.<MemberResponse>ok(response);
     }
 }

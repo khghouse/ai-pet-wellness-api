@@ -45,6 +45,43 @@
 
 ### 완료
 
+- REQ-002 로그인 구현
+  - 변경: 이메일과 비밀번호 기반 로그인 API 추가
+  - 변경: Controller용 `MemberLoginRequest`와 Service용 `MemberLoginServiceRequest` 분리
+  - 변경: `PasswordEncoder.matches()` 기반 비밀번호 검증 추가
+  - 변경: 존재하지 않는 이메일, 비밀번호 불일치, 탈퇴 회원, 비활성 회원 로그인 실패 처리 추가
+  - 변경: 로그인 API Controller, Service, REST Docs 테스트 추가
+  - 변경: 회원 API 문서에 로그인 섹션 추가
+  - 검증: 테스트를 먼저 작성해 컴파일 실패를 확인한 뒤 구현 후 성공 확인
+  - 관련 문서: `docs/requirements.md`
+
+### 검증
+
+- `./gradlew test --tests '*MemberControllerTest' --tests '*MemberServiceTest'`
+  - 결과: 구현 전 실패, 구현 후 성공
+  - 목적: 로그인 요청 검증, credential 검증, 회원 상태 검증 확인
+- `./gradlew test --tests '*MemberControllerTest' --tests '*MemberServiceTest' --tests '*MemberControllerDocsTest'`
+  - 결과: 성공
+  - 목적: 로그인 API 문서 snippet 생성 확인
+- `./gradlew spotlessApply`
+  - 결과: 성공
+  - 목적: 신규 로그인 테스트 코드 포맷 적용
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 테스트와 포맷 검사를 포함한 전체 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+
+### 인수인계 메모
+
+- REQ-002는 JWT 발급을 포함하지 않고 이메일/비밀번호 credential 검증까지만 처리한다.
+- 로그인 실패 응답은 이메일 존재 여부와 비밀번호 불일치 여부를 구분하지 않고 `LOGIN_FAILED`로 통일한다.
+
+## 2026-07-09
+
+### 완료
+
 - ArchUnit 아키텍처 검증 하네스 추가
   - 변경: ArchUnit JUnit 5 테스트 의존성 추가
   - 변경: Controller가 Repository를 직접 참조하지 못하게 검증하는 규칙 추가
