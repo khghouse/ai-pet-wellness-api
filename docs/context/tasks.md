@@ -62,3 +62,4 @@
 - [x] 테스트 하네스 Support 클래스 및 테스트 프로필 정리
 - [x] REST Docs 하네스 추가
 - [x] Flyway DB 마이그레이션 도구 추가
+- [x] ArchUnit 아키텍처 검증 하네스 추가

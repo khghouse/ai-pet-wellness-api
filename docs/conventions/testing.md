@@ -29,6 +29,8 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 │   ├── ControllerTestSupport.java
 │   ├── IntegrationTestSupport.java
 │   └── RepositoryTestSupport.java
+├── architecture/
+│   └── ArchitectureRuleTest.java
 ├── domain/
 │   └── {도메인명}/
 │       ├── controller/
@@ -42,6 +44,14 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 └── integration/
     └── {도메인명}IntegrationTest.java  # 명시 요청 시에만 작성
 ```
+
+## 아키텍처 테스트 기준
+
+- `architecture/ArchitectureRuleTest`에서 ArchUnit 기반 패키지 의존 규칙을 검증한다.
+- Controller는 Repository를 직접 참조하지 않는다.
+- Controller, Service, Repository 레이어 접근 방향을 검증한다.
+- Service 간 의존은 허용한다.
+- 다른 도메인의 Repository 직접 참조는 금지한다.
 
 ## Support 클래스 기준
 
