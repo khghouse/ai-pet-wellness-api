@@ -41,6 +41,40 @@
 
 ---
 
+## 2026-07-09
+
+### 완료
+
+- ArchUnit 아키텍처 검증 하네스 추가
+  - 변경: ArchUnit JUnit 5 테스트 의존성 추가
+  - 변경: Controller가 Repository를 직접 참조하지 못하게 검증하는 규칙 추가
+  - 변경: Controller, Service, Repository 레이어 접근 방향 검증 규칙 추가
+  - 변경: 다른 도메인의 Repository 직접 참조 금지 규칙 추가
+  - 변경: 도메인 간 Service 의존은 허용하도록 규칙 조정
+  - 변경: 기술 스택, 테스트 규칙, ADR 문서 갱신
+  - 검증: ArchUnit 의존성 추가 전 컴파일 실패를 확인한 뒤 의존성 및 규칙 적용 후 성공 확인
+
+### 검증
+
+- `./gradlew test --tests '*ArchitectureRuleTest'`
+  - 결과: 구현 전 실패, 구현 후 성공
+  - 목적: ArchUnit 의존성과 아키텍처 규칙 검증 확인
+- `./gradlew spotlessApply`
+  - 결과: 성공
+  - 목적: 신규 아키텍처 테스트 코드 포맷 적용
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: ArchUnit 규칙이 전체 테스트 생명주기에 포함되는지 확인
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: 전체 빌드와 패키징 검증
+
+### 인수인계 메모
+
+- 아키텍처 규칙은 `architecture/ArchitectureRuleTest`에서 관리한다.
+- 새 레이어나 도메인 간 협업 방식이 추가되면 ArchUnit 규칙도 함께 검토한다.
+- 현재 규칙은 도메인 간 Service 의존은 허용하고, 다른 도메인의 Repository 직접 참조는 금지한다.
+
 ## 2026-07-08
 
 ### 완료

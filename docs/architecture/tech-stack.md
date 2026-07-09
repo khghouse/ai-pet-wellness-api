@@ -14,7 +14,7 @@
   - `common-logging:0.1.0-SNAPSHOT`
   - `common-core:0.1.0-SNAPSHOT` (`common-web` 전이 의존성)
 - 보안 유틸리티: `spring-security-crypto`
-- 테스트: JUnit 5, Mockito, AssertJ, Spring Boot Web MVC Test, Spring Boot Data JPA Test
+- 테스트: JUnit 5, Mockito, AssertJ, Spring Boot Web MVC Test, Spring Boot Data JPA Test, ArchUnit
 - API 문서화: Spring REST Docs, Asciidoctor
 
 ## 기준

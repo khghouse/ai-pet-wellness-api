@@ -31,7 +31,8 @@ src/main/java/{패키지 경로}/{프로젝트명}/
 
 ## 규칙
 
-- 도메인 간 직접 의존은 금지한다. 필요 시 Service를 통해 접근한다.
+- 도메인 간 협력이 필요하면 Service를 통해 접근한다.
+- 다른 도메인의 Repository 직접 참조는 금지한다.
 - `global` 패키지는 특정 도메인에 종속되지 않는 공통 코드만 위치한다.
 - 설정 파일은 `application.yml` -> `application-{profile}.yml` 구조로 관리한다.
 
