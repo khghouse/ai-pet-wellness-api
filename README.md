@@ -1,46 +1,106 @@
-# Pet Wellness
+# Pet Wellness API
 
-반려동물 건강관리 백엔드 API를 실험적으로 구현하는 프로젝트입니다.
+반려동물 건강관리 서비스를 위한 백엔드 API 프로젝트입니다.
 
-이 저장소는 AI 에이전트를 활용해 백엔드 시스템을 개발하면서, 요구사항 구체화, 테스트 기반 검증, 하네스 엔지니어링을 함께 학습하는 것을 목표로 합니다.
+현재는 AI 에이전트 기반 개발 흐름과 하네스 엔지니어링을 학습하고, 그 위에서 기능을 점진적으로 구현하는 데 초점을 둡니다.
 
-## Scope
+## 프로젝트 방향
 
-초기 개발 범위는 반려동물 건강관리 서비스의 기본 백엔드 기능을 중심으로 합니다.
+- 하네스 엔지니어링 학습 및 적용
+- AI 에이전트가 참고할 요구사항과 프로젝트 컨텍스트 정리
+- 테스트, 문서화, 빌드 검증을 통한 AI 생성 코드 품질 관리
+- 반려동물 건강관리 도메인의 백엔드 API 점진적 구현
 
-구체적인 도메인과 기능은 요구사항을 정리하면서 단계적으로 확장합니다.
+## 기술 스택
 
-## Development Approach
-
-이 프로젝트는 AI 에이전트를 적극적으로 활용해 개발합니다.
-
-개발자의 역할은 직접 모든 코드를 작성하는 것보다, AI 에이전트가 올바르게 작업할 수 있도록 필요한 컨텍스트를 제공하고 요구사항을 구체화하는 데 집중합니다.
-
-이를 통해 다음을 실험하고 학습합니다.
-
-- AI 에이전트 기반 백엔드 개발
-- 요구사항을 코드와 테스트로 연결하는 과정
-- 하네스 엔지니어링
-- 반복적인 바이브코딩 과정에서 발생하는 시행착오와 개선 방법
-
-## Tech Stack
-
-현재 프로젝트는 최소한의 Java/Gradle 기반으로 시작합니다.
-
-- Java
+- Java 17
+- Spring Boot 4.0.6
 - Gradle
-- JUnit 5
+- Spring Data JPA / Hibernate
+- MySQL 8.x
+- H2
+- Flyway
+- Lombok
+- Spring REST Docs / Asciidoctor
+- JUnit 5, Mockito, AssertJ
+- Spotless
+- GitHub Actions
 
-구체적인 백엔드 프레임워크, 데이터베이스, 인증 방식 등은 요구사항을 구체화하면서 단계적으로 결정합니다.
+## 검증 하네스
 
-## Getting Started
+이 프로젝트는 AI 에이전트가 생성한 결과물을 검증하기 위해 다음 하네스를 사용합니다.
 
-테스트 실행:
+- `./gradlew check`: 테스트와 포맷 검증
+- `./gradlew build`: 전체 빌드, 테스트, API 문서 생성, 패키징 검증
+- Spotless: Java 코드 포맷 검증 및 적용
+- Spring REST Docs: 테스트 기반 API 문서 조각 생성
+- Flyway: DB 스키마 변경 이력 관리
+- GitHub Actions: PR 및 `main` 브랜치 push 시 CI 빌드 검증
+
+## 문서 구조
+
+프로젝트 컨텍스트는 `docs/` 아래에서 관리합니다.
+
+- `docs/requirements.md`: 기능 요구사항과 완료 기준
+- `docs/architecture/`: 기술 스택과 레이어 구조
+- `docs/conventions/`: 코딩, 테스트, 예외, API 응답, REST Docs 규칙
+- `docs/context/`: 작업 목록, 진행 기록, 백로그
+- `docs/adr/`: 아키텍처 결정 기록
+
+AI 에이전트 작업 규칙은 `AGENTS.md`에서 관리합니다.
+
+## 시작하기
+
+### 테스트
 
 ```bash
 ./gradlew test
 ```
 
-## Status
+### 검증
 
-초기 프로젝트 세팅 단계입니다.
+```bash
+./gradlew check
+```
+
+### 빌드
+
+```bash
+./gradlew build
+```
+
+### 포맷 적용
+
+```bash
+./gradlew spotlessApply
+```
+
+### API 문서 생성
+
+```bash
+./gradlew asciidoctor
+```
+
+생성된 문서는 `build/docs/asciidoc/index.html`에서 확인할 수 있습니다.
+
+## GitHub Packages 인증
+
+현재 일부 공통 모듈은 GitHub Packages를 통해 참조합니다.
+
+private 패키지를 사용하는 환경에서는 다음 인증 정보 중 하나가 필요합니다.
+
+- Gradle property: `gpr.user`, `gpr.key`
+- Environment variable: `GITHUB_USERNAME`, `GITHUB_PACKAGES_TOKEN`
+- GitHub Actions secret: `COMMON_MODULES_TOKEN`
+
+## 개발 흐름
+
+기능 개발은 다음 흐름을 기준으로 진행합니다.
+
+1. 요구사항과 관련 컨텍스트 문서를 확인한다.
+2. 작업 브랜치를 생성한다.
+3. 테스트를 먼저 작성하거나 검증 기준을 명확히 한다.
+4. 작은 단위로 구현한다.
+5. 문서와 작업 기록을 갱신한다.
+6. `./gradlew check`와 `./gradlew build`로 검증한다.
+7. PR을 생성하고 CI 결과를 확인한다.
