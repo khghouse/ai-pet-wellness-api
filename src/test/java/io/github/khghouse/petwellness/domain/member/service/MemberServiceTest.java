@@ -141,4 +141,63 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .extracting("errorCode")
                 .isEqualTo(MemberErrorCode.LOGIN_FAILED);
     }
+
+    @DisplayName("정상 요청이면 회원을 탈퇴 상태로 변경한다")
+    @Test
+    void withdraw_validRequest_updatesMemberWithdrawalState() {
+        // given
+        memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
+        Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
+
+        // when
+        memberService.withdraw(member.getId());
+
+        // then
+        assertThat(member.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
+        assertThat(member.isDeleted()).isTrue();
+        assertThat(member.getDeletedAt()).isNotNull();
+    }
+
+    @DisplayName("존재하지 않는 회원이면 회원 탈퇴에 실패한다")
+    @Test
+    void withdraw_notFoundMember_throwsMemberNotFound() {
+        // when & then
+        assertThatThrownBy(() -> memberService.withdraw(999L))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(MemberErrorCode.MEMBER_NOT_FOUND);
+    }
+
+    @DisplayName("이미 탈퇴한 회원이면 회원 탈퇴에 실패한다")
+    @Test
+    void withdraw_alreadyWithdrawnMember_throwsMemberAlreadyWithdrawn() {
+        // given
+        memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
+        Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
+        memberService.withdraw(member.getId());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.withdraw(member.getId()))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(MemberErrorCode.MEMBER_ALREADY_WITHDRAWN);
+    }
+
+    @DisplayName("탈퇴한 회원은 로그인할 수 없다")
+    @Test
+    void login_withdrawnMember_throwsLoginFailed() {
+        // given
+        memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
+        Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
+        memberService.withdraw(member.getId());
+
+        MemberLoginServiceRequest request =
+                new MemberLoginServiceRequest("member@example.com", "password1");
+
+        // when & then
+        assertThatThrownBy(() -> memberService.login(request))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(MemberErrorCode.LOGIN_FAILED);
+    }
 }
