@@ -1,6 +1,7 @@
 package io.github.khghouse.petwellness.domain.member.service;
 
 import io.github.khghouse.common.core.global.exception.CustomException;
+import io.github.khghouse.petwellness.domain.member.dto.request.MemberLoginServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
 import io.github.khghouse.petwellness.domain.member.entity.Member;
@@ -28,9 +29,27 @@ public class MemberService {
         return MemberResponse.from(memberRepository.save(member));
     }
 
+    @Transactional(readOnly = true)
+    public MemberResponse login(MemberLoginServiceRequest request) {
+        Member member =
+                memberRepository
+                        .findByEmail(request.email())
+                        .orElseThrow(() -> new CustomException(MemberErrorCode.LOGIN_FAILED));
+
+        validateLoginAvailable(member, request.password());
+
+        return MemberResponse.from(member);
+    }
+
     private void validateEmailNotDuplicated(String email) {
         if (memberRepository.existsByEmail(email)) {
             throw new CustomException(MemberErrorCode.EMAIL_DUPLICATED);
+        }
+    }
+
+    private void validateLoginAvailable(Member member, String password) {
+        if (!member.isActive() || !passwordEncoder.matches(password, member.getPassword())) {
+            throw new CustomException(MemberErrorCode.LOGIN_FAILED);
         }
     }
 }

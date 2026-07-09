@@ -13,6 +13,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import io.github.khghouse.petwellness.domain.member.dto.request.MemberLoginRequest;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
 import io.github.khghouse.petwellness.domain.member.entity.MemberStatus;
@@ -41,6 +42,39 @@ class MemberControllerDocsTest extends RestDocsSupport {
 
         mockMvc.perform(
                         post("/api/v1/members")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "{class-name}/{method-name}",
+                                requestFields(
+                                        fieldWithPath("email").type(STRING).description("이메일"),
+                                        fieldWithPath("password").type(STRING).description("비밀번호")),
+                                responseFields(
+                                        fieldWithPath("status")
+                                                .type(NUMBER)
+                                                .description("HTTP 상태 코드"),
+                                        fieldWithPath("success")
+                                                .type(BOOLEAN)
+                                                .description("요청 성공 여부"),
+                                        fieldWithPath("data").type(OBJECT).description("응답 데이터"),
+                                        fieldWithPath("data.id").type(NUMBER).description("회원 식별자"),
+                                        fieldWithPath("data.email").type(STRING).description("이메일"),
+                                        fieldWithPath("data.status")
+                                                .type(STRING)
+                                                .description("회원 상태"))));
+    }
+
+    @DisplayName("로그인 API를 문서화한다")
+    @Test
+    void login_validRequest_generatesRestDocs() throws Exception {
+        MemberLoginRequest request = new MemberLoginRequest("member@example.com", "password1");
+        given(memberService.login(any()))
+                .willReturn(new MemberResponse(1L, "member@example.com", MemberStatus.ACTIVE));
+
+        mockMvc.perform(
+                        post("/api/v1/members/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())

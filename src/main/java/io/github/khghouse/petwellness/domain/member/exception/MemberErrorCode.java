@@ -3,7 +3,8 @@ package io.github.khghouse.petwellness.domain.member.exception;
 import io.github.khghouse.common.core.global.exception.ErrorInfo;
 
 public enum MemberErrorCode implements ErrorInfo {
-    EMAIL_DUPLICATED(409, "EMAIL_DUPLICATED", "이미 가입된 이메일입니다.");
+    EMAIL_DUPLICATED(409, "EMAIL_DUPLICATED", "이미 가입된 이메일입니다."),
+    LOGIN_FAILED(401, "LOGIN_FAILED", "이메일 또는 비밀번호가 일치하지 않습니다.");
 
     private final int status;
     private final String code;

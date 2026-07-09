@@ -63,3 +63,4 @@
 - [x] REST Docs 하네스 추가
 - [x] Flyway DB 마이그레이션 도구 추가
 - [x] ArchUnit 아키텍처 검증 하네스 추가
+- [x] REQ-002 로그인 구현
