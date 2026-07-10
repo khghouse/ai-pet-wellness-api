@@ -12,6 +12,11 @@ jwt:
   refresh-token-expiration: 1209600000
 
 common:
+  logging:
+    masking-fields:
+      - password
+      - accesstoken
+      - refreshtoken
   auth:
     permit-all-paths:
       - /api/v1/members

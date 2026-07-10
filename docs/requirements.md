@@ -70,6 +70,8 @@
 
 ### REQ-002: 로그인
 
+- **상태:** REQ-005에 의해 대체됨
+- **대체 내용:** 로그인 API와 응답을 `POST /api/auth/login` 기반 JWT 토큰 발급 방식으로 전환한다.
 - **목표:** 사용자는 가입한 이메일과 비밀번호로 로그인할 수 있다.
 - **행위자:** 사용자
 - **범위:** 이메일 기반 일반 로그인
@@ -173,6 +175,8 @@
 
 ### REQ-004: 회원 정보 조회
 
+- **상태:** REQ-005에 의해 대체됨
+- **대체 내용:** 회원 식별자 입력 없이 JWT 인증 주체를 사용하는 `GET /api/v1/members/me`로 전환한다.
 - **목표:** 사용자는 회원 식별자를 통해 자신의 회원 정보를 조회할 수 있다.
 - **행위자:** 사용자
 - **범위:** 회원 식별자 기반 단건 조회
@@ -313,7 +317,7 @@
     - Spring Boot 실행 전 `.env`를 셸에서 로드하거나 IDE 환경 변수로 등록한다.
 
 ```dotenv
-JWT_SECRET=your-jwt-secret
+JWT_SECRET=replace-with-a-random-secret-at-least-32-bytes-long
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=your-redis-password

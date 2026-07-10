@@ -55,8 +55,20 @@
   - 검증: `common-auth`의 JWT 고유 식별자 수정본 재배포 후 Refresh Token Rotation 성공 확인
   - 관련 문서: `docs/requirements.md`, `docs/adr/0006-use-common-auth.md`
 
+- REQ-005 코드 리뷰 반영
+  - 변경: HTTP 요청·응답 로그의 비밀번호와 Access/Refresh Token 필드 마스킹 설정 추가
+  - 변경: 재발급된 Access Token의 보호 API 호출과 Refresh Token의 연속 재발급 검증 추가
+  - 변경: 로그아웃 후 기존 Refresh Token 재사용 실패 검증 추가
+  - 변경: REQ-002와 REQ-004가 REQ-005에 의해 대체됐음을 명시
+  - 변경: `.env.example`, README와 요구사항의 JWT Secret 예시를 32바이트 이상으로 수정
+  - 검증: 인증 통합 테스트 로그에서 JWT 패턴 0건, `[MASKED]` 30건 확인
+  - 관련 문서: `README.md`, `docs/requirements.md`
+
 ### 검증
 
+- `./gradlew test --tests '*AuthIntegrationTest' --tests '*CommonModulesAutoConfigurationTest'`
+  - 결과: 성공
+  - 목적: 토큰 마스킹 설정, 재발급 토큰 사용 가능 여부와 로그아웃 후 Refresh Token 폐기 확인
 - `./gradlew --refresh-dependencies test --tests '*AuthIntegrationTest'`
   - 결과: 성공
   - 목적: 재배포된 `common-auth`를 사용한 로그인, 재발급, 로그아웃, JWT 인증과 Redis 토큰 관리 검증

@@ -144,14 +144,21 @@ class AuthIntegrationTest extends IntegrationTestSupport {
     @DisplayName("유효한 Refresh Token이면 기존 토큰을 폐기하고 새 토큰 쌍을 발급한다")
     @Test
     void reissue_validRefreshToken_rotatesTokens() throws Exception {
-        signup("member@example.com");
+        Member member = signup("member@example.com");
         TokenPair original = login("member@example.com", "password1");
 
         TokenPair reissued = reissue(original.refreshToken());
 
         assertThat(reissued.accessToken()).isNotBlank();
         assertThat(reissued.refreshToken()).isNotBlank();
+        assertThat(reissued.accessToken()).isNotEqualTo(original.accessToken());
         assertThat(reissued.refreshToken()).isNotEqualTo(original.refreshToken());
+
+        mockMvc.perform(
+                        get("/api/v1/members/me")
+                                .header(HttpHeaders.AUTHORIZATION, bearer(reissued.accessToken())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(member.getId()));
 
         ReissueRequest oldTokenRequest = new ReissueRequest(original.refreshToken());
         mockMvc.perform(
@@ -160,6 +167,10 @@ class AuthIntegrationTest extends IntegrationTestSupport {
                                 .content(objectMapper.writeValueAsString(oldTokenRequest)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error.code").value("REFRESH_TOKEN_NOT_FOUND"));
+
+        TokenPair rotatedAgain = reissue(reissued.refreshToken());
+        assertThat(rotatedAgain.accessToken()).isNotBlank();
+        assertThat(rotatedAgain.refreshToken()).isNotEqualTo(reissued.refreshToken());
     }
 
     @DisplayName("탈퇴한 회원이면 Refresh Token을 재발급할 수 없다")
@@ -178,9 +189,9 @@ class AuthIntegrationTest extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.error.code").value("AUTH_USER_NOT_FOUND"));
     }
 
-    @DisplayName("로그아웃한 Access Token으로 보호된 API를 호출하면 실패한다")
+    @DisplayName("로그아웃하면 기존 Access Token과 Refresh Token을 모두 사용할 수 없다")
     @Test
-    void logout_validAccessToken_blacklistsAccessToken() throws Exception {
+    void logout_validTokens_revokesAccessAndRefreshTokens() throws Exception {
         signup("member@example.com");
         TokenPair tokens = login("member@example.com", "password1");
 
@@ -195,6 +206,14 @@ class AuthIntegrationTest extends IntegrationTestSupport {
                                 .header(HttpHeaders.AUTHORIZATION, bearer(tokens.accessToken())))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error.code").value("TOKEN_BLACKLISTED"));
+
+        ReissueRequest request = new ReissueRequest(tokens.refreshToken());
+        mockMvc.perform(
+                        post("/api/auth/reissue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("REFRESH_TOKEN_NOT_FOUND"));
     }
 
     @DisplayName("인증된 회원이 탈퇴하면 자신의 회원 상태가 변경된다")
