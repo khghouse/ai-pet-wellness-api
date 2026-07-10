@@ -41,6 +41,38 @@
 
 ---
 
+## 2026-07-11
+
+### 완료
+
+- REQ-005 JWT 로그인 및 토큰 관리 구현
+  - 변경: `common-auth` 기반 로그인, 토큰 재발급, 로그아웃과 JWT 인증 필터 연동
+  - 변경: 회원 인증 정보를 제공하는 `MemberAuthUserReader` 구현 및 `ROLE_MEMBER` 권한 부여
+  - 변경: 회원 정보 조회와 탈퇴 API를 JWT 인증 주체를 사용하는 `/api/v1/members/me`로 전환
+  - 변경: Redis Cloud 환경 변수 설정과 로컬 `.env.example` 추가
+  - 변경: 테스트와 CI에서 외부 Redis 대신 Testcontainers Redis를 사용하도록 통합 테스트 구성
+  - 변경: 인증 API REST Docs 테스트와 문서 추가
+  - 검증: `common-auth`의 JWT 고유 식별자 수정본 재배포 후 Refresh Token Rotation 성공 확인
+  - 관련 문서: `docs/requirements.md`, `docs/adr/0006-use-common-auth.md`
+
+### 검증
+
+- `./gradlew --refresh-dependencies test --tests '*AuthIntegrationTest'`
+  - 결과: 성공
+  - 목적: 재배포된 `common-auth`를 사용한 로그인, 재발급, 로그아웃, JWT 인증과 Redis 토큰 관리 검증
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, Spotless 포맷과 아키텍처 규칙 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+
+### 인수인계 메모
+
+- 테스트와 CI는 Docker에서 `redis:7.4-alpine` 컨테이너를 실행하며 Redis Cloud에 연결하지 않는다.
+- 로컬 실행 시 `.env`를 셸 환경 변수로 로드해야 하며 실제 값은 Git에 포함하지 않는다.
+- `common-auth:0.1.0-SNAPSHOT`은 JWT마다 고유한 `jti`를 발급하는 수정본을 사용한다.
+
 ## 2026-07-10
 
 ### 완료

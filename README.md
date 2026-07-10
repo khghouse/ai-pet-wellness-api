@@ -20,9 +20,11 @@
 - MySQL 8.x
 - H2
 - Flyway
+- Spring Security / JWT
+- Redis
 - Lombok
 - Spring REST Docs / Asciidoctor
-- JUnit 5, Mockito, AssertJ
+- JUnit 5, Mockito, AssertJ, Testcontainers
 - Spotless
 - GitHub Actions
 
@@ -50,6 +52,28 @@
 AI 에이전트 작업 규칙은 `AGENTS.md`에서 관리합니다.
 
 ## 시작하기
+
+### 환경 변수
+
+JWT 인증과 Redis 연결에는 `.env.example`에 정의된 환경 변수가 필요합니다.
+
+```dotenv
+JWT_SECRET=your-jwt-secret
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
+```
+
+Spring Boot는 `.env`를 자동으로 읽지 않으므로 실행 전에 환경 변수를 로드합니다.
+
+```bash
+set -a
+source .env
+set +a
+./gradlew bootRun
+```
+
+인증 통합 테스트는 Testcontainers Redis를 사용하므로 로컬 실행 시 Docker Desktop이 필요합니다.
 
 ### 테스트
 

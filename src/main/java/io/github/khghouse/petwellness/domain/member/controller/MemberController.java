@@ -1,17 +1,16 @@
 package io.github.khghouse.petwellness.domain.member.controller;
 
+import io.github.khghouse.common.auth.global.security.AuthPrincipal;
 import io.github.khghouse.common.web.global.response.ApiResponse;
-import io.github.khghouse.petwellness.domain.member.dto.request.MemberLoginRequest;
-import io.github.khghouse.petwellness.domain.member.dto.request.MemberLoginServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupRequest;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,21 +29,20 @@ public class MemberController {
         return ApiResponse.<MemberResponse>ok(response);
     }
 
-    @PostMapping("/login")
-    public ApiResponse<MemberResponse> login(@Valid @RequestBody MemberLoginRequest request) {
-        MemberResponse response = memberService.login(MemberLoginServiceRequest.from(request));
+    @GetMapping("/me")
+    public ApiResponse<MemberResponse> getMe(Authentication authentication) {
+        MemberResponse response = memberService.getMember(getAuthenticatedMemberId(authentication));
         return ApiResponse.<MemberResponse>ok(response);
     }
 
-    @GetMapping("/{memberId}")
-    public ApiResponse<MemberResponse> getMember(@PathVariable Long memberId) {
-        MemberResponse response = memberService.getMember(memberId);
-        return ApiResponse.<MemberResponse>ok(response);
-    }
-
-    @DeleteMapping("/{memberId}")
-    public ApiResponse<Void> withdraw(@PathVariable Long memberId) {
-        memberService.withdraw(memberId);
+    @DeleteMapping("/me")
+    public ApiResponse<Void> withdraw(Authentication authentication) {
+        memberService.withdraw(getAuthenticatedMemberId(authentication));
         return ApiResponse.<Void>ok();
+    }
+
+    private Long getAuthenticatedMemberId(Authentication authentication) {
+        AuthPrincipal principal = (AuthPrincipal) authentication.getPrincipal();
+        return principal.getUserId();
     }
 }

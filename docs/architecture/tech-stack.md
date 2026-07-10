@@ -12,9 +12,11 @@
 - 공통 모듈:
   - `common-web:0.1.0-SNAPSHOT`
   - `common-logging:0.1.0-SNAPSHOT`
+  - `common-auth:0.1.0-SNAPSHOT`
   - `common-core:0.1.0-SNAPSHOT` (`common-web` 전이 의존성)
+- 인증 / 보안: Spring Security, JWT, Redis
 - 보안 유틸리티: `spring-security-crypto`
-- 테스트: JUnit 5, Mockito, AssertJ, Spring Boot Web MVC Test, Spring Boot Data JPA Test, ArchUnit
+- 테스트: JUnit 5, Mockito, AssertJ, Spring Boot Web MVC Test, Spring Boot Data JPA Test, Testcontainers, ArchUnit
 - API 문서화: Spring REST Docs, Asciidoctor
 
 ## 기준

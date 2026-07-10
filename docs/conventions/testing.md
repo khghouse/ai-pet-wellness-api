@@ -57,7 +57,7 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 
 | 클래스 | 용도 |
 |---|---|
-| `ControllerTestSupport` | Spring Security 포함 Controller 슬라이스 테스트 |
+| `ControllerTestSupport` | 보안 필터를 제외한 Controller MVC 계약 테스트 |
 | `IntegrationTestSupport` | Service + Repository 실제 연동 테스트 및 명시 요청된 MockMvc 기반 전체 플로우 통합 테스트 |
 | `RepositoryTestSupport` | JPA / Querydsl Repository 슬라이스 테스트 |
 
@@ -79,6 +79,15 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 ### ControllerTestSupport
 
 - `@WebMvcTest` 사용
+- `@AutoConfigureMockMvc(addFilters = false)`로 보안 필터를 제외한다.
 - 공통 보안/인프라 설정만 부모 클래스에서 관리한다.
 - 도메인 서비스 `@MockBean`은 각 Controller 테스트 클래스에서 직접 선언한다.
-- 부모 클래스는 `JwtAuthenticationFilter`, `JwtAuthenticationEntryPoint`, `MemberAuthenticationProvider`처럼 여러 Controller 테스트에서 반복되는 보안 의존성만 가진다.
+- JWT 필터와 인증/인가 경계는 `integration/auth/*Test`에서 전체 애플리케이션 흐름으로 검증한다.
+
+## Redis Testcontainers 기준
+
+- 인증 통합 테스트는 외부 Redis Cloud에 연결하지 않는다.
+- Testcontainers로 고정 버전의 Redis 이미지를 실행한다.
+- Redis host와 port는 `@DynamicPropertySource`로 테스트 컨텍스트에 주입한다.
+- 로컬에서 인증 통합 테스트를 실행하려면 Docker Desktop이 필요하다.
+- Docker를 사용할 수 없는 환경에서는 인증 통합 테스트를 건너뛰고, Docker가 제공되는 CI에서 반드시 실행한다.
