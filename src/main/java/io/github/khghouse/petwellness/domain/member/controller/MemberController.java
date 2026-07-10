@@ -38,6 +38,6 @@ public class MemberController {
     @DeleteMapping("/{memberId}")
     public ApiResponse<Void> withdraw(@PathVariable Long memberId) {
         memberService.withdraw(memberId);
-        return ApiResponse.ok();
+        return ApiResponse.<Void>ok();
     }
 }

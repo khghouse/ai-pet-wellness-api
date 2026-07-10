@@ -11,6 +11,7 @@ import io.github.khghouse.petwellness.domain.member.entity.MemberStatus;
 import io.github.khghouse.petwellness.domain.member.exception.MemberErrorCode;
 import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
 import io.github.khghouse.petwellness.support.IntegrationTestSupport;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ class MemberServiceTest extends IntegrationTestSupport {
     @Autowired private MemberRepository memberRepository;
 
     @Autowired private PasswordEncoder passwordEncoder;
+
+    @Autowired private EntityManager entityManager;
 
     @DisplayName("정상 입력이면 회원을 생성하고 비밀번호를 단방향 해시로 저장한다")
     @Test
@@ -151,11 +154,14 @@ class MemberServiceTest extends IntegrationTestSupport {
 
         // when
         memberService.withdraw(member.getId());
+        entityManager.flush();
+        entityManager.clear();
 
         // then
-        assertThat(member.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
-        assertThat(member.isDeleted()).isTrue();
-        assertThat(member.getDeletedAt()).isNotNull();
+        Member withdrawnMember = memberRepository.findById(member.getId()).orElseThrow();
+        assertThat(withdrawnMember.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
+        assertThat(withdrawnMember.isDeleted()).isTrue();
+        assertThat(withdrawnMember.getDeletedAt()).isNotNull();
     }
 
     @DisplayName("존재하지 않는 회원이면 회원 탈퇴에 실패한다")
