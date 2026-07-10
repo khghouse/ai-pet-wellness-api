@@ -6,7 +6,8 @@ public enum MemberErrorCode implements ErrorInfo {
     EMAIL_DUPLICATED(409, "EMAIL_DUPLICATED", "이미 가입된 이메일입니다."),
     LOGIN_FAILED(401, "LOGIN_FAILED", "이메일 또는 비밀번호가 일치하지 않습니다."),
     MEMBER_NOT_FOUND(404, "MEMBER_NOT_FOUND", "회원을 찾을 수 없습니다."),
-    MEMBER_ALREADY_WITHDRAWN(422, "MEMBER_ALREADY_WITHDRAWN", "이미 탈퇴한 회원입니다.");
+    MEMBER_ALREADY_WITHDRAWN(422, "MEMBER_ALREADY_WITHDRAWN", "이미 탈퇴한 회원입니다."),
+    MEMBER_WITHDRAWN(422, "MEMBER_WITHDRAWN", "탈퇴한 회원입니다.");
 
     private final int status;
     private final String code;

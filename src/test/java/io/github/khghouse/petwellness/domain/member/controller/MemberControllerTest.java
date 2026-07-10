@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -158,6 +159,52 @@ class MemberControllerTest extends ControllerTestSupport {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("LOGIN_FAILED"));
+    }
+
+    @DisplayName("존재하는 회원이면 민감 정보 없이 회원 정보를 조회한다")
+    @Test
+    void getMember_validRequest_returnsMemberWithoutSensitiveInformation() throws Exception {
+        given(memberService.getMember(1L))
+                .willReturn(new MemberResponse(1L, "member@example.com", MemberStatus.ACTIVE));
+
+        mockMvc.perform(get("/api/v1/members/{memberId}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.email").value("member@example.com"))
+                .andExpect(jsonPath("$.data.status").value("ACTIVE"))
+                .andExpect(jsonPath("$.data.password").doesNotExist())
+                .andExpect(jsonPath("$.data.deleted").doesNotExist())
+                .andExpect(jsonPath("$.data.deletedAt").doesNotExist());
+
+        then(memberService).should().getMember(1L);
+    }
+
+    @DisplayName("존재하지 않는 회원이면 회원 정보 조회에 실패한다")
+    @Test
+    void getMember_notFoundMember_returnsNotFound() throws Exception {
+        willThrow(new CustomException(MemberErrorCode.MEMBER_NOT_FOUND))
+                .given(memberService)
+                .getMember(1L);
+
+        mockMvc.perform(get("/api/v1/members/{memberId}", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("MEMBER_NOT_FOUND"));
+    }
+
+    @DisplayName("탈퇴한 회원이면 회원 정보 조회에 실패한다")
+    @Test
+    void getMember_withdrawnMember_returnsUnprocessableEntity() throws Exception {
+        willThrow(new CustomException(MemberErrorCode.MEMBER_WITHDRAWN))
+                .given(memberService)
+                .getMember(1L);
+
+        mockMvc.perform(get("/api/v1/members/{memberId}", 1L))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("MEMBER_WITHDRAWN"));
     }
 
     @DisplayName("회원 탈퇴에 성공하면 응답 데이터 없이 성공 응답을 반환한다")
