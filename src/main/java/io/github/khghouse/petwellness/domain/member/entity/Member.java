@@ -56,10 +56,6 @@ public class Member extends BaseEntity {
         return status == MemberStatus.WITHDRAWN || deleted;
     }
 
-    public void deactivate() {
-        this.status = MemberStatus.INACTIVE;
-    }
-
     public void withdraw() {
         this.status = MemberStatus.WITHDRAWN;
         this.deleted = true;

@@ -41,6 +41,18 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
+    @Transactional(readOnly = true)
+    public MemberResponse getMember(Long memberId) {
+        Member member =
+                memberRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        validateMemberReadable(member);
+
+        return MemberResponse.from(member);
+    }
+
     @Transactional
     public void withdraw(Long memberId) {
         Member member =
@@ -68,6 +80,12 @@ public class MemberService {
     private void validateNotWithdrawn(Member member) {
         if (member.isWithdrawn()) {
             throw new CustomException(MemberErrorCode.MEMBER_ALREADY_WITHDRAWN);
+        }
+    }
+
+    private void validateMemberReadable(Member member) {
+        if (member.isWithdrawn()) {
+            throw new CustomException(MemberErrorCode.MEMBER_WITHDRAWN);
         }
     }
 }

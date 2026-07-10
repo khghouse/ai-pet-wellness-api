@@ -36,6 +36,24 @@ include::{snippets}/member-controller-docs-test/login_valid-request_generates-re
 
 include::{snippets}/member-controller-docs-test/login_valid-request_generates-rest-docs/response-fields.adoc[]
 
+=== 회원 정보 조회
+
+==== HTTP request
+
+include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/http-request.adoc[]
+
+==== Path Parameters
+
+include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/path-parameters.adoc[]
+
+==== HTTP response
+
+include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/http-response.adoc[]
+
+==== Response fields
+
+include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/response-fields.adoc[]
+
 === 회원 탈퇴
 
 ==== HTTP request

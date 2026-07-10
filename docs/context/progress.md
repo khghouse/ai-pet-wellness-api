@@ -45,6 +45,20 @@
 
 ### 완료
 
+- 회원 비활성 상태 제거
+  - 변경: `MemberStatus`에서 `INACTIVE` 상태와 `Member.deactivate()` 메서드 제거
+  - 변경: REQ-002의 비활성 회원 로그인 제한 정책 및 테스트 제거
+  - 변경: 회원 상태를 현재 범위에 필요한 `ACTIVE`, `WITHDRAWN`으로 단순화
+  - 관련 문서: `docs/requirements.md`
+
+- REQ-004 회원 정보 조회 구현
+  - 변경: 회원 식별자 기반 회원 정보 조회 API 추가
+  - 변경: 탈퇴 회원 조회를 차단하는 `MEMBER_WITHDRAWN` 오류 코드 추가
+  - 변경: 회원 정보 조회 Controller, Service, REST Docs 테스트 추가
+  - 변경: 회원 API 문서에 회원 정보 조회 섹션 추가
+  - 검증: 테스트를 먼저 작성해 컴파일 실패를 확인한 뒤 구현 후 성공 확인
+  - 관련 문서: `docs/requirements.md`
+
 - REQ-003 회원 탈퇴 구현
   - 변경: 회원 식별자 기반 탈퇴 API 추가
   - 변경: `MemberService.withdraw(Long)` 추가
@@ -57,6 +71,30 @@
 
 ### 검증
 
+- `./gradlew test --tests '*MemberServiceTest'`
+  - 결과: 제거 전후 성공
+  - 목적: 회원 상태 단순화 후 로그인과 탈퇴 정책 회귀 확인
+- `./gradlew spotlessApply`
+  - 결과: 성공
+  - 목적: 상태 제거 코드 포맷 적용
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 테스트와 포맷 검사를 포함한 전체 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+- `./gradlew test --tests '*MemberControllerTest' --tests '*MemberServiceTest' --tests '*MemberControllerDocsTest'`
+  - 결과: 구현 전 실패, 구현 후 성공
+  - 목적: 회원 정보 조회 성공, 존재하지 않는 회원 및 탈퇴 회원 조회 실패, 민감 정보 미노출 확인
+- `./gradlew spotlessApply`
+  - 결과: 성공
+  - 목적: 신규 회원 정보 조회 코드 포맷 적용
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 테스트와 포맷 검사를 포함한 전체 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
 - `./gradlew test --tests '*MemberControllerTest' --tests '*MemberServiceTest'`
   - 결과: 구현 전 실패, 구현 후 성공
   - 목적: 회원 탈퇴 상태 변경, 중복 탈퇴 방지, 탈퇴 후 로그인 차단 확인
@@ -75,6 +113,9 @@
 
 ### 인수인계 메모
 
+- 현재 회원 상태는 `ACTIVE`, `WITHDRAWN`만 사용하며, 탈퇴 시 `WITHDRAWN`과 `deleted == true`를 함께 기록한다.
+- REQ-004는 JWT 인증 기반 현재 로그인 회원 식별을 포함하지 않고 `memberId`를 경로 변수로 받는다.
+- JWT 인증 도입 시 회원 식별자를 인증 정보에서 추출하는 방식으로 변경한다.
 - REQ-003은 JWT 인증 기반 본인 확인, 비밀번호 재확인, 연관 도메인 데이터 정리, 도메인 이벤트 발행을 포함하지 않는다.
 - 탈퇴 성공 응답은 `ApiResponse<Void>`로 반환하며 `data` 필드는 포함하지 않는다.
 

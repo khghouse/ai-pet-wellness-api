@@ -127,22 +127,45 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .isEqualTo(MemberErrorCode.LOGIN_FAILED);
     }
 
-    @DisplayName("비활성 상태의 회원이면 로그인에 실패한다")
+    @DisplayName("존재하는 회원이면 회원 정보를 조회한다")
     @Test
-    void login_inactiveMember_throwsLoginFailed() {
+    void getMember_validRequest_returnsMember() {
         // given
         memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
         Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
-        member.deactivate();
 
-        MemberLoginServiceRequest request =
-                new MemberLoginServiceRequest("member@example.com", "password1");
+        // when
+        var response = memberService.getMember(member.getId());
 
+        // then
+        assertThat(response.id()).isEqualTo(member.getId());
+        assertThat(response.email()).isEqualTo("member@example.com");
+        assertThat(response.status()).isEqualTo(MemberStatus.ACTIVE);
+    }
+
+    @DisplayName("존재하지 않는 회원이면 회원 정보 조회에 실패한다")
+    @Test
+    void getMember_notFoundMember_throwsMemberNotFound() {
         // when & then
-        assertThatThrownBy(() -> memberService.login(request))
+        assertThatThrownBy(() -> memberService.getMember(999L))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode")
-                .isEqualTo(MemberErrorCode.LOGIN_FAILED);
+                .isEqualTo(MemberErrorCode.MEMBER_NOT_FOUND);
+    }
+
+    @DisplayName("탈퇴한 회원이면 회원 정보 조회에 실패한다")
+    @Test
+    void getMember_withdrawnMember_throwsMemberWithdrawn() {
+        // given
+        memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
+        Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
+        memberService.withdraw(member.getId());
+
+        // when & then
+        assertThatThrownBy(() -> memberService.getMember(member.getId()))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(MemberErrorCode.MEMBER_WITHDRAWN);
     }
 
     @DisplayName("정상 요청이면 회원을 탈퇴 상태로 변경한다")
