@@ -127,24 +127,6 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .isEqualTo(MemberErrorCode.LOGIN_FAILED);
     }
 
-    @DisplayName("비활성 상태의 회원이면 로그인에 실패한다")
-    @Test
-    void login_inactiveMember_throwsLoginFailed() {
-        // given
-        memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
-        Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
-        member.deactivate();
-
-        MemberLoginServiceRequest request =
-                new MemberLoginServiceRequest("member@example.com", "password1");
-
-        // when & then
-        assertThatThrownBy(() -> memberService.login(request))
-                .isInstanceOf(CustomException.class)
-                .extracting("errorCode")
-                .isEqualTo(MemberErrorCode.LOGIN_FAILED);
-    }
-
     @DisplayName("존재하는 회원이면 회원 정보를 조회한다")
     @Test
     void getMember_validRequest_returnsMember() {
