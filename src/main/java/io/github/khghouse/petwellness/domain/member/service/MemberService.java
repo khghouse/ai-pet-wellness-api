@@ -41,6 +41,18 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
+    @Transactional
+    public void withdraw(Long memberId) {
+        Member member =
+                memberRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        validateNotWithdrawn(member);
+
+        member.withdraw();
+    }
+
     private void validateEmailNotDuplicated(String email) {
         if (memberRepository.existsByEmail(email)) {
             throw new CustomException(MemberErrorCode.EMAIL_DUPLICATED);
@@ -50,6 +62,12 @@ public class MemberService {
     private void validateLoginAvailable(Member member, String password) {
         if (!member.isActive() || !passwordEncoder.matches(password, member.getPassword())) {
             throw new CustomException(MemberErrorCode.LOGIN_FAILED);
+        }
+    }
+
+    private void validateNotWithdrawn(Member member) {
+        if (member.isWithdrawn()) {
+            throw new CustomException(MemberErrorCode.MEMBER_ALREADY_WITHDRAWN);
         }
     }
 }

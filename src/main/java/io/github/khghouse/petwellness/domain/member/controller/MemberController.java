@@ -9,6 +9,8 @@ import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,5 +33,11 @@ public class MemberController {
     public ApiResponse<MemberResponse> login(@Valid @RequestBody MemberLoginRequest request) {
         MemberResponse response = memberService.login(MemberLoginServiceRequest.from(request));
         return ApiResponse.<MemberResponse>ok(response);
+    }
+
+    @DeleteMapping("/{memberId}")
+    public ApiResponse<Void> withdraw(@PathVariable Long memberId) {
+        memberService.withdraw(memberId);
+        return ApiResponse.<Void>ok();
     }
 }

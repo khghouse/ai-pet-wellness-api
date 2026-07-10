@@ -2,6 +2,9 @@ package io.github.khghouse.petwellness.domain.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -155,5 +158,43 @@ class MemberControllerTest extends ControllerTestSupport {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("LOGIN_FAILED"));
+    }
+
+    @DisplayName("회원 탈퇴에 성공하면 응답 데이터 없이 성공 응답을 반환한다")
+    @Test
+    void withdraw_validRequest_returnsSuccessWithoutData() throws Exception {
+        mockMvc.perform(delete("/api/v1/members/{memberId}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        then(memberService).should().withdraw(1L);
+    }
+
+    @DisplayName("존재하지 않는 회원이면 회원 탈퇴에 실패한다")
+    @Test
+    void withdraw_notFoundMember_returnsNotFound() throws Exception {
+        willThrow(new CustomException(MemberErrorCode.MEMBER_NOT_FOUND))
+                .given(memberService)
+                .withdraw(1L);
+
+        mockMvc.perform(delete("/api/v1/members/{memberId}", 1L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("MEMBER_NOT_FOUND"));
+    }
+
+    @DisplayName("이미 탈퇴한 회원이면 회원 탈퇴에 실패한다")
+    @Test
+    void withdraw_alreadyWithdrawnMember_returnsUnprocessableEntity() throws Exception {
+        willThrow(new CustomException(MemberErrorCode.MEMBER_ALREADY_WITHDRAWN))
+                .given(memberService)
+                .withdraw(1L);
+
+        mockMvc.perform(delete("/api/v1/members/{memberId}", 1L))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("MEMBER_ALREADY_WITHDRAWN"));
     }
 }

@@ -3,6 +3,7 @@ package io.github.khghouse.petwellness.domain.member.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
@@ -10,6 +11,8 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -97,5 +100,23 @@ class MemberControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.status")
                                                 .type(STRING)
                                                 .description("회원 상태"))));
+    }
+
+    @DisplayName("회원 탈퇴 API를 문서화한다")
+    @Test
+    void withdraw_validRequest_generatesRestDocs() throws Exception {
+        mockMvc.perform(delete("/api/v1/members/{memberId}", 1L))
+                .andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "{class-name}/{method-name}",
+                                pathParameters(parameterWithName("memberId").description("회원 식별자")),
+                                responseFields(
+                                        fieldWithPath("status")
+                                                .type(NUMBER)
+                                                .description("HTTP 상태 코드"),
+                                        fieldWithPath("success")
+                                                .type(BOOLEAN)
+                                                .description("요청 성공 여부"))));
     }
 }
