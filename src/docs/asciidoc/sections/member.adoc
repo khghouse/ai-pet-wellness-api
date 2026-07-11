@@ -18,41 +18,23 @@ include::{snippets}/member-controller-docs-test/signup_valid-request_generates-r
 
 include::{snippets}/member-controller-docs-test/signup_valid-request_generates-rest-docs/response-fields.adoc[]
 
-=== 로그인
-
-==== HTTP request
-
-include::{snippets}/member-controller-docs-test/login_valid-request_generates-rest-docs/http-request.adoc[]
-
-==== Request fields
-
-include::{snippets}/member-controller-docs-test/login_valid-request_generates-rest-docs/request-fields.adoc[]
-
-==== HTTP response
-
-include::{snippets}/member-controller-docs-test/login_valid-request_generates-rest-docs/http-response.adoc[]
-
-==== Response fields
-
-include::{snippets}/member-controller-docs-test/login_valid-request_generates-rest-docs/response-fields.adoc[]
-
 === 회원 정보 조회
 
 ==== HTTP request
 
-include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/http-request.adoc[]
+include::{snippets}/member-controller-docs-test/get-me_valid-request_generates-rest-docs/http-request.adoc[]
 
-==== Path Parameters
+==== Request headers
 
-include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/path-parameters.adoc[]
+include::{snippets}/member-controller-docs-test/get-me_valid-request_generates-rest-docs/request-headers.adoc[]
 
 ==== HTTP response
 
-include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/http-response.adoc[]
+include::{snippets}/member-controller-docs-test/get-me_valid-request_generates-rest-docs/http-response.adoc[]
 
 ==== Response fields
 
-include::{snippets}/member-controller-docs-test/get-member_valid-request_generates-rest-docs/response-fields.adoc[]
+include::{snippets}/member-controller-docs-test/get-me_valid-request_generates-rest-docs/response-fields.adoc[]
 
 === 회원 탈퇴
 
@@ -60,9 +42,9 @@ include::{snippets}/member-controller-docs-test/get-member_valid-request_generat
 
 include::{snippets}/member-controller-docs-test/withdraw_valid-request_generates-rest-docs/http-request.adoc[]
 
-==== Path Parameters
+==== Request headers
 
-include::{snippets}/member-controller-docs-test/withdraw_valid-request_generates-rest-docs/path-parameters.adoc[]
+include::{snippets}/member-controller-docs-test/withdraw_valid-request_generates-rest-docs/request-headers.adoc[]
 
 ==== HTTP response
 

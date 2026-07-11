@@ -11,3 +11,23 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      username: default
+      password:
+
+jwt:
+  secret: test-jwt-secret-must-be-at-least-32-bytes
+  access-token-expiration: 1800000
+  refresh-token-expiration: 1209600000
+
+common:
+  auth:
+    permit-all-paths:
+      - /api/v1/members
+      - /api/auth/login
+      - /api/auth/reissue
+      - /docs/**
+      - /h2-console/**

@@ -36,5 +36,8 @@ bin/
 ### VS Code ###
 .vscode/
 
+### Environment variables ###
+.env
+
 ### Mac OS ###
 .DS_Store

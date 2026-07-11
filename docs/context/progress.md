@@ -41,6 +41,63 @@
 
 ---
 
+## 2026-07-11
+
+### 완료
+
+- REQ-005 JWT 로그인 및 토큰 관리 구현
+  - 변경: `common-auth` 기반 로그인, 토큰 재발급, 로그아웃과 JWT 인증 필터 연동
+  - 변경: 회원 인증 정보를 제공하는 `MemberAuthUserReader` 구현 및 `ROLE_MEMBER` 권한 부여
+  - 변경: 회원 정보 조회와 탈퇴 API를 JWT 인증 주체를 사용하는 `/api/v1/members/me`로 전환
+  - 변경: Redis Cloud 환경 변수 설정과 로컬 `.env.example` 추가
+  - 변경: 테스트와 CI에서 외부 Redis 대신 Testcontainers Redis를 사용하도록 통합 테스트 구성
+  - 변경: 인증 API REST Docs 테스트와 문서 추가
+  - 검증: `common-auth`의 JWT 고유 식별자 수정본 재배포 후 Refresh Token Rotation 성공 확인
+  - 관련 문서: `docs/requirements.md`, `docs/adr/0006-use-common-auth.md`
+
+- REQ-005 코드 리뷰 반영
+  - 변경: HTTP 요청·응답 로그의 비밀번호와 Access/Refresh Token 필드 마스킹 설정 추가
+  - 변경: 재발급된 Access Token의 보호 API 호출과 Refresh Token의 연속 재발급 검증 추가
+  - 변경: 로그아웃 후 기존 Refresh Token 재사용 실패 검증 추가
+  - 변경: REQ-002와 REQ-004가 REQ-005에 의해 대체됐음을 명시
+  - 변경: `.env.example`, README와 요구사항의 JWT Secret 예시를 32바이트 이상으로 수정
+  - 검증: 인증 통합 테스트 로그에서 JWT 패턴 0건, `[MASKED]` 30건 확인
+  - 관련 문서: `README.md`, `docs/requirements.md`
+
+- common-modules 0.1.0 불변 버전 전환
+  - 변경: `common-web`, `common-logging`, `common-auth` 의존성을 `0.1.0`으로 고정
+  - 변경: `common-core:0.1.0` 전이 의존성 확인
+  - 변경: 기술 스택과 ADR의 공통 모듈 버전 결정 갱신
+  - 검증: 런타임 의존성 그래프에 공통 모듈 SNAPSHOT 버전이 없음을 확인
+  - 관련 문서: `docs/architecture/tech-stack.md`, `docs/adr/0007-use-common-modules-release.md`
+
+### 검증
+
+- `./gradlew --refresh-dependencies dependencies --configuration runtimeClasspath`
+  - 결과: 성공
+  - 목적: 네 공통 모듈이 모두 `0.1.0`으로 해석되고 SNAPSHOT 전이 의존성이 없는지 확인
+- `./gradlew --rerun-tasks test --tests '*AuthIntegrationTest' --tests '*CommonModulesAutoConfigurationTest'`
+  - 결과: 성공, 인증 통합 테스트 10개 실행 및 `skipped=0` 확인
+  - 목적: 불변 릴리스의 JWT 인증 흐름과 공통 모듈 자동 설정 호환성 확인
+- `./gradlew test --tests '*AuthIntegrationTest' --tests '*CommonModulesAutoConfigurationTest'`
+  - 결과: 성공
+  - 목적: 토큰 마스킹 설정, 재발급 토큰 사용 가능 여부와 로그아웃 후 Refresh Token 폐기 확인
+- `./gradlew --refresh-dependencies test --tests '*AuthIntegrationTest'`
+  - 결과: 성공
+  - 목적: 재배포된 `common-auth`를 사용한 로그인, 재발급, 로그아웃, JWT 인증과 Redis 토큰 관리 검증
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, Spotless 포맷과 아키텍처 규칙 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+
+### 인수인계 메모
+
+- 테스트와 CI는 Docker에서 `redis:7.4-alpine` 컨테이너를 실행하며 Redis Cloud에 연결하지 않는다.
+- 로컬 실행 시 `.env`를 셸 환경 변수로 로드해야 하며 실제 값은 Git에 포함하지 않는다.
+- `common-auth:0.1.0`은 JWT마다 고유한 `jti`를 발급하는 불변 릴리스를 사용한다.
+
 ## 2026-07-10
 
 ### 완료

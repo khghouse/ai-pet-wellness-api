@@ -6,4 +6,5 @@
 :toclevels: 2
 
 include::src/docs/asciidoc/sections/overview.adoc[]
+include::src/docs/asciidoc/sections/auth.adoc[]
 include::src/docs/asciidoc/sections/member.adoc[]
