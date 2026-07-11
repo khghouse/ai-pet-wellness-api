@@ -4,6 +4,8 @@
 
 승인됨
 
+> 의존성 버전 결정은 [0007. common-modules 불변 릴리스 사용](0007-use-common-modules-release.md)으로 대체됐다. 나머지 결정은 유지한다.
+
 ## 배경
 
 로그인 이후 보호된 API에서 현재 사용자를 식별하고, Access Token과 Refresh Token의 발급, 재발급, 로그아웃을 일관되게 처리할 인증 기반이 필요하다.

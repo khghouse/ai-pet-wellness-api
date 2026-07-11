@@ -64,8 +64,21 @@
   - 검증: 인증 통합 테스트 로그에서 JWT 패턴 0건, `[MASKED]` 30건 확인
   - 관련 문서: `README.md`, `docs/requirements.md`
 
+- common-modules 0.1.0 불변 버전 전환
+  - 변경: `common-web`, `common-logging`, `common-auth` 의존성을 `0.1.0`으로 고정
+  - 변경: `common-core:0.1.0` 전이 의존성 확인
+  - 변경: 기술 스택과 ADR의 공통 모듈 버전 결정 갱신
+  - 검증: 런타임 의존성 그래프에 공통 모듈 SNAPSHOT 버전이 없음을 확인
+  - 관련 문서: `docs/architecture/tech-stack.md`, `docs/adr/0007-use-common-modules-release.md`
+
 ### 검증
 
+- `./gradlew --refresh-dependencies dependencies --configuration runtimeClasspath`
+  - 결과: 성공
+  - 목적: 네 공통 모듈이 모두 `0.1.0`으로 해석되고 SNAPSHOT 전이 의존성이 없는지 확인
+- `./gradlew --rerun-tasks test --tests '*AuthIntegrationTest' --tests '*CommonModulesAutoConfigurationTest'`
+  - 결과: 성공, 인증 통합 테스트 10개 실행 및 `skipped=0` 확인
+  - 목적: 불변 릴리스의 JWT 인증 흐름과 공통 모듈 자동 설정 호환성 확인
 - `./gradlew test --tests '*AuthIntegrationTest' --tests '*CommonModulesAutoConfigurationTest'`
   - 결과: 성공
   - 목적: 토큰 마스킹 설정, 재발급 토큰 사용 가능 여부와 로그아웃 후 Refresh Token 폐기 확인
@@ -83,7 +96,7 @@
 
 - 테스트와 CI는 Docker에서 `redis:7.4-alpine` 컨테이너를 실행하며 Redis Cloud에 연결하지 않는다.
 - 로컬 실행 시 `.env`를 셸 환경 변수로 로드해야 하며 실제 값은 Git에 포함하지 않는다.
-- `common-auth:0.1.0-SNAPSHOT`은 JWT마다 고유한 `jti`를 발급하는 수정본을 사용한다.
+- `common-auth:0.1.0`은 JWT마다 고유한 `jti`를 발급하는 불변 릴리스를 사용한다.
 
 ## 2026-07-10
 
