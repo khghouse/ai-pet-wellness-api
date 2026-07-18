@@ -43,7 +43,7 @@
 
 프로젝트 컨텍스트는 `docs/` 아래에서 관리합니다.
 
-- `docs/requirements.md`: 기능 요구사항과 완료 기준
+- `docs/requirements/README.md`: 기능 요구사항 목록과 완료 기준
 - `docs/architecture/`: 기술 스택과 레이어 구조
 - `docs/conventions/`: 코딩, 테스트, 예외, API 응답, REST Docs 규칙
 - `docs/context/`: 작업 목록, 진행 기록, 백로그
