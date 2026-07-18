@@ -70,7 +70,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 문서는 다음 기준으로 참고한다.
 
-- `docs/requirements.md`: 기능 범위와 완료 기준
+- `docs/requirements/README.md`: 기능 범위, 요구사항 목록과 완료 기준
+- `docs/requirements/{도메인명}/README.md`: 도메인 엔티티, 관계, 상태값과 공통 정책
+- `docs/requirements/{도메인명}/REQ-xxx-*.md`: 개별 기능 범위와 완료 기준
 - `docs/architecture/`: 기술 스택, 패키지 구조, 레이어 규칙
 - `docs/conventions/`: 코딩, 테스트, 예외 처리, API 응답, 네이밍 규칙
 - `docs/context/tasks.md`: 진행하기로 결정한 작업
@@ -80,7 +82,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 기능 구현이나 의미 있는 변경을 진행할 때는 다음 흐름을 따른다.
 
-1. `docs/requirements.md` 또는 사용자 요청에서 작업 단위를 도출한다.
+1. `docs/requirements/README.md`, 대상 도메인의 `README.md`, 해당 `REQ-xxx-*.md` 또는 사용자 요청에서 작업 단위를 도출한다.
 2. 작업을 계획하거나 시작할 때 `docs/context/tasks.md`에 항목을 추가하거나 갱신한다.
 3. 다음처럼 이후 구현 방향에 계속 영향을 주는 결정은 `docs/adr/`에 기록한다.
    - 프레임워크, 데이터베이스, 인증 방식, 외부 연동 방식 선택

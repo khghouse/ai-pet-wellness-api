@@ -41,6 +41,37 @@
 
 ---
 
+## 2026-07-18
+
+### 완료
+
+- 도메인 요구사항 기준 문서 정리
+  - 변경: `member/README.md`에 `Member` 엔티티와 회원 도메인 공통 정책을 분리
+  - 변경: REQ-001에는 회원가입에 직접 관련된 정책과 `Member` 참조만 유지
+  - 변경: AGENTS.md와 요구사항 인덱스에 도메인 README 및 개별 REQ 문서 확인 순서 명시
+  - 변경: 새 요구사항의 전역 `REQ-xxx` 순번 관리 규칙 추가
+  - 검증: 회원 요구사항 파일과 공통 모델의 단일 정의 위치 확인
+  - 관련 문서: `AGENTS.md`, `docs/requirements/README.md`, `docs/requirements/member/README.md`
+
+- 요구사항 문서 도메인별 분리
+  - 변경: 단일 `docs/requirements.md`를 `docs/requirements/` 인덱스와 도메인별 요구사항 파일로 분리
+  - 변경: 기존 REQ-001~005를 `member/`로 이동하고, 향후 요구사항을 위한 `pet/` 디렉터리 추가
+  - 변경: `AGENTS.md`와 README의 요구사항 참조 경로 갱신
+  - 검증: 요구사항 파일 목록과 기존 경로 참조 확인
+  - 관련 문서: `docs/requirements/`, `AGENTS.md`, `README.md`
+
+### 검증
+
+- `rg --files docs/requirements`
+  - 결과: 성공
+  - 목적: 요구사항 인덱스와 도메인별 요구사항 파일 생성 확인
+- `git diff --check`
+  - 결과: 성공
+  - 목적: 문서 변경의 공백 오류 확인
+- `rg --files docs/requirements/member`
+  - 결과: 성공
+  - 목적: 회원 도메인 기준 문서와 개별 요구사항 파일 구성 확인
+
 ## 2026-07-11
 
 ### 완료
@@ -53,7 +84,7 @@
   - 변경: 테스트와 CI에서 외부 Redis 대신 Testcontainers Redis를 사용하도록 통합 테스트 구성
   - 변경: 인증 API REST Docs 테스트와 문서 추가
   - 검증: `common-auth`의 JWT 고유 식별자 수정본 재배포 후 Refresh Token Rotation 성공 확인
-  - 관련 문서: `docs/requirements.md`, `docs/adr/0006-use-common-auth.md`
+  - 관련 문서: `docs/requirements/`, `docs/adr/0006-use-common-auth.md`
 
 - REQ-005 코드 리뷰 반영
   - 변경: HTTP 요청·응답 로그의 비밀번호와 Access/Refresh Token 필드 마스킹 설정 추가
@@ -62,7 +93,7 @@
   - 변경: REQ-002와 REQ-004가 REQ-005에 의해 대체됐음을 명시
   - 변경: `.env.example`, README와 요구사항의 JWT Secret 예시를 32바이트 이상으로 수정
   - 검증: 인증 통합 테스트 로그에서 JWT 패턴 0건, `[MASKED]` 30건 확인
-  - 관련 문서: `README.md`, `docs/requirements.md`
+  - 관련 문서: `README.md`, `docs/requirements/`
 
 - common-modules 0.1.0 불변 버전 전환
   - 변경: `common-web`, `common-logging`, `common-auth` 의존성을 `0.1.0`으로 고정
@@ -106,7 +137,7 @@
   - 변경: `MemberStatus`에서 `INACTIVE` 상태와 `Member.deactivate()` 메서드 제거
   - 변경: REQ-002의 비활성 회원 로그인 제한 정책 및 테스트 제거
   - 변경: 회원 상태를 현재 범위에 필요한 `ACTIVE`, `WITHDRAWN`으로 단순화
-  - 관련 문서: `docs/requirements.md`
+  - 관련 문서: `docs/requirements/`
 
 - REQ-004 회원 정보 조회 구현
   - 변경: 회원 식별자 기반 회원 정보 조회 API 추가
@@ -114,7 +145,7 @@
   - 변경: 회원 정보 조회 Controller, Service, REST Docs 테스트 추가
   - 변경: 회원 API 문서에 회원 정보 조회 섹션 추가
   - 검증: 테스트를 먼저 작성해 컴파일 실패를 확인한 뒤 구현 후 성공 확인
-  - 관련 문서: `docs/requirements.md`
+  - 관련 문서: `docs/requirements/`
 
 - REQ-003 회원 탈퇴 구현
   - 변경: 회원 식별자 기반 탈퇴 API 추가
@@ -124,7 +155,7 @@
   - 변경: 회원 탈퇴 Controller, Service, REST Docs 테스트 추가
   - 변경: 회원 API 문서에 회원 탈퇴 섹션 추가
   - 검증: 테스트를 먼저 작성해 컴파일 실패를 확인한 뒤 구현 후 성공 확인
-  - 관련 문서: `docs/requirements.md`
+  - 관련 문서: `docs/requirements/`
 
 ### 검증
 
@@ -188,7 +219,7 @@
   - 변경: 로그인 API Controller, Service, REST Docs 테스트 추가
   - 변경: 회원 API 문서에 로그인 섹션 추가
   - 검증: 테스트를 먼저 작성해 컴파일 실패를 확인한 뒤 구현 후 성공 확인
-  - 관련 문서: `docs/requirements.md`
+  - 관련 문서: `docs/requirements/`
 
 ### 검증
 
@@ -340,7 +371,7 @@
   - 변경: 회원 가입 Controller 슬라이스 테스트와 서비스 통합 테스트 추가
   - 변경: 기술 스택 문서에 비밀번호 해싱 및 Boot 4 Web MVC 테스트 모듈 반영
   - 검증: 테스트를 먼저 작성해 컴파일 실패를 확인한 뒤 구현 후 성공 확인
-  - 관련 문서: `docs/requirements.md`, `docs/architecture/tech-stack.md`
+  - 관련 문서: `docs/requirements/`, `docs/architecture/tech-stack.md`
 
 ### 검증
 
