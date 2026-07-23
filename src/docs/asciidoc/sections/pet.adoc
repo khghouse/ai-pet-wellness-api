@@ -1,0 +1,23 @@
+== Pet
+
+=== 반려견 등록
+
+==== HTTP request
+
+include::{snippets}/pet-controller-docs-test/register_valid-request_generates-rest-docs/http-request.adoc[]
+
+==== Request headers
+
+include::{snippets}/pet-controller-docs-test/register_valid-request_generates-rest-docs/request-headers.adoc[]
+
+==== Request fields
+
+include::{snippets}/pet-controller-docs-test/register_valid-request_generates-rest-docs/request-fields.adoc[]
+
+==== HTTP response
+
+include::{snippets}/pet-controller-docs-test/register_valid-request_generates-rest-docs/http-response.adoc[]
+
+==== Response fields
+
+include::{snippets}/pet-controller-docs-test/register_valid-request_generates-rest-docs/response-fields.adoc[]

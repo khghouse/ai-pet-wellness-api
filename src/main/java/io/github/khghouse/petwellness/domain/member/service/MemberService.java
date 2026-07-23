@@ -38,6 +38,18 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
+    @Transactional(readOnly = true)
+    public Member getActiveMember(Long memberId) {
+        Member member =
+                memberRepository
+                        .findById(memberId)
+                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        validateMemberReadable(member);
+
+        return member;
+    }
+
     @Transactional
     public void withdraw(Long memberId) {
         withdrawMember(memberId);
