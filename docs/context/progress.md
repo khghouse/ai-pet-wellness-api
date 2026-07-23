@@ -41,6 +41,31 @@
 
 ---
 
+## 2026-07-23
+
+### 완료
+
+- 반려동물 도메인 모델 및 REQ-006 설계
+  - 변경: `Breed`, `Pet`, `PetWeight`, `PetMembership`의 책임, 관계, 상태값과 초기 견종 데이터를 정의
+  - 변경: 반려견 등록 시 첫 체중 이력과 `OWNER`, `ACTIVE` 멤버십을 함께 생성하는 REQ-006 작성
+  - 변경: API 목적별 응답 DTO와 재사용 가능한 요약 DTO 조합 원칙 추가
+  - 변경: 반려견 검증과 리워드 수령 자격 정책을 백로그로 기록
+  - 관련 문서: `docs/requirements/pet/`, `docs/adr/0008-design-pet-domain-model.md`, `docs/conventions/api-response.md`
+
+### 검증
+
+- `rg --files docs/requirements/pet docs/adr`
+  - 결과: 성공
+  - 목적: 반려동물 요구사항과 ADR 파일 생성 확인
+- `git diff --check`
+  - 결과: 성공
+  - 목적: 문서 변경의 공백 오류 확인
+
+### 인수인계 메모
+
+- 반려견 등록 구현은 REQ-006과 `pet/README.md`를 기준으로 별도 기능 브랜치에서 진행한다.
+- 체중 이력은 추가 전용이며, 현재 체중은 최신 `PetWeight` 이력으로 조회한다.
+
 ## 2026-07-18
 
 ### 완료

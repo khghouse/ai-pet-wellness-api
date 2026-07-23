@@ -21,19 +21,10 @@
 - 결제, 광고, 외부 제휴 연동
 - 고급 데이터 분석 또는 추천 기능
 
-## 요구사항 목록
+## 도메인
 
-### 회원
-
-- [REQ-001: 회원 가입](member/REQ-001-signup.md)
-- [REQ-002: 로그인](member/REQ-002-login.md) - REQ-005에 의해 대체됨
-- [REQ-003: 회원 탈퇴](member/REQ-003-withdrawal.md)
-- [REQ-004: 회원 정보 조회](member/REQ-004-member-information.md) - REQ-005에 의해 대체됨
-- [REQ-005: JWT 로그인 및 토큰 관리](member/REQ-005-jwt-token-management.md)
-
-### 반려동물
-
-- 요구사항 작성 예정
+- [회원](member/README.md)
+- [반려동물](pet/README.md)
 
 ## 작성 및 관리 규칙
 
@@ -54,8 +45,6 @@
 ## 열린 질문
 
 - [ ] v1에서 포함할 최소 도메인 범위는 어디까지인가?
-- [ ] 인증 방식과 토큰 정책은 어떻게 정의할 것인가?
-- [ ] 반려동물 정보에서 필수로 받을 항목은 무엇인가?
 - [ ] 활동 기록은 어떤 단위로 저장할 것인가?
 
 ## 용어집
