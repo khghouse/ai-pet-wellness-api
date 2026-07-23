@@ -216,9 +216,9 @@ class AuthIntegrationTest extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.error.code").value("REFRESH_TOKEN_NOT_FOUND"));
     }
 
-    @DisplayName("인증된 회원이 탈퇴하면 자신의 회원 상태가 변경된다")
+    @DisplayName("인증된 회원이 탈퇴하면 현재 Access Token과 Refresh Token을 즉시 폐기한다")
     @Test
-    void withdraw_validAccessToken_withdrawsAuthenticatedMember() throws Exception {
+    void withdraw_validAccessToken_revokesTokensAndWithdrawsAuthenticatedMember() throws Exception {
         Member member = signup("member@example.com");
         TokenPair tokens = login("member@example.com", "password1");
 
@@ -230,6 +230,20 @@ class AuthIntegrationTest extends IntegrationTestSupport {
         Member withdrawnMember = memberRepository.findById(member.getId()).orElseThrow();
         assertThat(withdrawnMember.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
         assertThat(withdrawnMember.isDeleted()).isTrue();
+
+        mockMvc.perform(
+                        get("/api/v1/members/me")
+                                .header(HttpHeaders.AUTHORIZATION, bearer(tokens.accessToken())))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("TOKEN_BLACKLISTED"));
+
+        ReissueRequest request = new ReissueRequest(tokens.refreshToken());
+        mockMvc.perform(
+                        post("/api/auth/reissue")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("REFRESH_TOKEN_NOT_FOUND"));
     }
 
     private Member signup(String email) {
