@@ -45,6 +45,11 @@
 
 ### 완료
 
+- 회원 탈퇴 시 인증 토큰 즉시 폐기
+  - 변경: 탈퇴 요청의 Access Token을 `common-auth` 로그아웃 처리로 Redis 블랙리스트에 추가하고 회원 Refresh Token을 삭제
+  - 변경: 탈퇴 직후 기존 Access Token 보호 API 호출 및 기존 Refresh Token 재발급이 모두 실패하는 통합 테스트 추가
+  - 관련 문서: `docs/requirements/member/REQ-003-withdrawal.md`, `docs/context/backlog.md`
+
 - 반려동물 도메인 모델 및 REQ-006 설계
   - 변경: `Breed`, `Pet`, `PetWeight`, `PetMembership`의 책임, 관계, 상태값과 초기 견종 데이터를 정의
   - 변경: 반려견 등록 시 첫 체중 이력과 `OWNER`, `ACTIVE` 멤버십을 함께 생성하는 REQ-006 작성
@@ -53,6 +58,16 @@
   - 관련 문서: `docs/requirements/pet/`, `docs/adr/0008-design-pet-domain-model.md`, `docs/conventions/api-response.md`
 
 ### 검증
+
+- `./gradlew test --tests '*MemberControllerTest' --tests '*MemberControllerDocsTest' --tests '*AuthIntegrationTest'`
+  - 결과: 성공
+  - 목적: 회원 탈퇴 시 Access Token 블랙리스트 처리와 Refresh Token 삭제를 포함한 인증 흐름 확인
+- `./gradlew --no-daemon check`
+  - 결과: 성공
+  - 목적: 전체 테스트와 Spotless 포맷 검증
+- `./gradlew --no-daemon build`
+  - 결과: 성공
+  - 목적: REST Docs 생성과 Spring Boot JAR 패키징 검증
 
 - `rg --files docs/requirements/pet docs/adr`
   - 결과: 성공
