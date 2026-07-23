@@ -6,6 +6,7 @@ import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupRequ
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/members")
 @RequiredArgsConstructor
 public class MemberController {
+
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String BEARER_PREFIX = "Bearer ";
 
     private final MemberService memberService;
 
@@ -36,13 +40,19 @@ public class MemberController {
     }
 
     @DeleteMapping("/me")
-    public ApiResponse<Void> withdraw(Authentication authentication) {
-        memberService.withdraw(getAuthenticatedMemberId(authentication));
+    public ApiResponse<Void> withdraw(HttpServletRequest request, Authentication authentication) {
+        memberService.withdraw(
+                getAuthenticatedMemberId(authentication), extractAccessTokenFromRequest(request));
         return ApiResponse.<Void>ok();
     }
 
     private Long getAuthenticatedMemberId(Authentication authentication) {
         AuthPrincipal principal = (AuthPrincipal) authentication.getPrincipal();
         return principal.getUserId();
+    }
+
+    private String extractAccessTokenFromRequest(HttpServletRequest request) {
+        String authorization = request.getHeader(AUTHORIZATION_HEADER);
+        return authorization.substring(BEARER_PREFIX.length());
     }
 }

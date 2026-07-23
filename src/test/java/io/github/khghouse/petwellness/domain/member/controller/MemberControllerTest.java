@@ -1,6 +1,7 @@
 package io.github.khghouse.petwellness.domain.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willThrow;
@@ -146,13 +147,16 @@ class MemberControllerTest extends ControllerTestSupport {
     @DisplayName("회원 탈퇴에 성공하면 응답 데이터 없이 성공 응답을 반환한다")
     @Test
     void withdraw_validRequest_returnsSuccessWithoutData() throws Exception {
-        mockMvc.perform(delete("/api/v1/members/me").principal(authenticatedMember()))
+        mockMvc.perform(
+                        delete("/api/v1/members/me")
+                                .header("Authorization", "Bearer access-token")
+                                .principal(authenticatedMember()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data").doesNotExist());
 
-        then(memberService).should().withdraw(1L);
+        then(memberService).should().withdraw(eq(1L), eq("access-token"));
     }
 
     @DisplayName("존재하지 않는 회원이면 회원 탈퇴에 실패한다")
@@ -160,9 +164,12 @@ class MemberControllerTest extends ControllerTestSupport {
     void withdraw_notFoundMember_returnsNotFound() throws Exception {
         willThrow(new CustomException(MemberErrorCode.MEMBER_NOT_FOUND))
                 .given(memberService)
-                .withdraw(1L);
+                .withdraw(1L, "access-token");
 
-        mockMvc.perform(delete("/api/v1/members/me").principal(authenticatedMember()))
+        mockMvc.perform(
+                        delete("/api/v1/members/me")
+                                .header("Authorization", "Bearer access-token")
+                                .principal(authenticatedMember()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("MEMBER_NOT_FOUND"));
@@ -173,9 +180,12 @@ class MemberControllerTest extends ControllerTestSupport {
     void withdraw_alreadyWithdrawnMember_returnsUnprocessableEntity() throws Exception {
         willThrow(new CustomException(MemberErrorCode.MEMBER_ALREADY_WITHDRAWN))
                 .given(memberService)
-                .withdraw(1L);
+                .withdraw(1L, "access-token");
 
-        mockMvc.perform(delete("/api/v1/members/me").principal(authenticatedMember()))
+        mockMvc.perform(
+                        delete("/api/v1/members/me")
+                                .header("Authorization", "Bearer access-token")
+                                .principal(authenticatedMember()))
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("MEMBER_ALREADY_WITHDRAWN"));

@@ -1,5 +1,6 @@
 package io.github.khghouse.petwellness.domain.member.service;
 
+import io.github.khghouse.common.auth.domain.auth.service.AuthService;
 import io.github.khghouse.common.core.global.exception.CustomException;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
 import io.github.khghouse.petwellness.domain.member.dto.response.MemberResponse;
@@ -17,6 +18,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     @Transactional
     public MemberResponse signup(MemberSignupServiceRequest request) {
@@ -30,11 +32,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public MemberResponse getMember(Long memberId) {
-        Member member =
-                memberRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
-
+        Member member = findMember(memberId);
         validateMemberReadable(member);
 
         return MemberResponse.from(member);
@@ -54,10 +52,17 @@ public class MemberService {
 
     @Transactional
     public void withdraw(Long memberId) {
-        Member member =
-                memberRepository
-                        .findById(memberId)
-                        .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
+        withdrawMember(memberId);
+    }
+
+    @Transactional
+    public void withdraw(Long memberId, String accessToken) {
+        withdrawMember(memberId);
+        authService.logout(accessToken, memberId);
+    }
+
+    private void withdrawMember(Long memberId) {
+        Member member = findMember(memberId);
 
         validateNotWithdrawn(member);
 
@@ -68,6 +73,12 @@ public class MemberService {
         if (memberRepository.existsByEmail(email)) {
             throw new CustomException(MemberErrorCode.EMAIL_DUPLICATED);
         }
+    }
+
+    private Member findMember(Long memberId) {
+        return memberRepository
+                .findById(memberId)
+                .orElseThrow(() -> new CustomException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     private void validateNotWithdrawn(Member member) {
