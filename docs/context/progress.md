@@ -45,6 +45,12 @@
 
 ### 완료
 
+- REQ-006 반려견 등록 구현
+  - 변경: `POST /api/v1/pets`에서 인증 회원의 반려견, 최초 체중 이력, `OWNER`/`ACTIVE` 멤버십을 하나의 트랜잭션으로 생성
+  - 변경: 활성 견종 검증, 입력 검증, 목적별 응답 DTO와 회원 Service 협력 추가
+  - 변경: 반려견 관련 테이블과 초기 견종 24종을 Flyway로 등록
+  - 변경: Controller, Service, REST Docs 테스트와 반려견 API 문서 추가
+
 - 반려동물 도메인 모델 및 REQ-006 설계
   - 변경: `Breed`, `Pet`, `PetWeight`, `PetMembership`의 책임, 관계, 상태값과 초기 견종 데이터를 정의
   - 변경: 반려견 등록 시 첫 체중 이력과 `OWNER`, `ACTIVE` 멤버십을 함께 생성하는 REQ-006 작성
@@ -53,6 +59,16 @@
   - 관련 문서: `docs/requirements/pet/`, `docs/adr/0008-design-pet-domain-model.md`, `docs/conventions/api-response.md`
 
 ### 검증
+
+- `./gradlew clean test --tests '*PetServiceTest' --tests '*PetControllerTest' --tests '*PetControllerDocsTest'`
+  - 결과: 성공
+  - 목적: 반려견 등록 서비스, 입력 검증, REST Docs 스니펫 생성 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, 아키텍처 규칙과 코드 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot 패키징 검증
 
 - `rg --files docs/requirements/pet docs/adr`
   - 결과: 성공
