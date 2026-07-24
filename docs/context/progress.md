@@ -45,12 +45,48 @@
 
 ### 완료
 
+- API 인수 시나리오 테스트 데이터 격리 보완
+  - 변경: SCN-001 종료 후 반려견 멤버십, 체중 이력, 반려견, 회원 데이터를 정리하도록 `@AfterEach` 추가
+  - 배경: 인수 테스트가 남긴 반려견 연관 데이터가 이후 인증 통합 테스트의 회원 삭제를 막아 CI가 실행 순서에 따라 실패하던 문제 해결
+
+- SCN-001 회원 가입부터 반려견 등록까지 API 인수 시나리오 테스트
+  - 변경: 실제 임의 포트의 Spring Boot 서버에 HTTP 요청을 보내 회원 가입, 로그인, 내 정보 조회, 반려견 등록 흐름을 검증
+  - 변경: Redis Testcontainers와 테스트 데이터 정리로 외부 환경에 의존하지 않는 시나리오 테스트 구성
+  - 변경: 시나리오 문서, 테스트 규칙, API 인수 시나리오 테스트 ADR 추가
+  - 관련 문서: `docs/test-scenarios/SCN-001-member-pet-registration.md`, `docs/adr/0009-use-api-acceptance-tests.md`
+
 - AI 에이전트 병렬 작업 Worktree 규칙 추가
   - 변경: 의미 있는 변경 시 작업 브랜치와 독립 Git worktree를 함께 생성하도록 작업 흐름 보완
   - 변경: 브랜치 명명, 생성 전 상태 확인, 병렬 작업의 worktree 격리 기준을 명시
   - 관련 문서: `AGENTS.md`
 
 ### 검증
+
+- `./gradlew clean test`
+  - 결과: 성공
+  - 목적: CI와 같은 깨끗한 상태에서 전체 테스트 및 테스트 간 데이터 격리 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs 생성과 Spring Boot JAR 패키징 검증
+
+- `./gradlew test --tests '*MemberPetJourneyAcceptanceTest'`
+  - 결과: 성공
+  - 목적: 실제 HTTP 서버와 Redis Testcontainers 환경에서 SCN-001 검증
+- `./gradlew spotlessApply`
+  - 결과: 성공
+  - 목적: API 인수 시나리오 테스트 코드 포맷 적용
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs 생성과 Spring Boot JAR 패키징 검증
+- `git diff --check`
+  - 결과: 성공
+  - 목적: 문서와 코드 변경의 공백 오류 확인
 
 - `git diff --check`
   - 결과: 성공
