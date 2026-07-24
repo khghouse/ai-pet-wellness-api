@@ -7,6 +7,7 @@
 - `domain/.../service/*Test`는 Service와 Repository를 함께 사용하는 통합 테스트를 작성한다.
 - `integration/*Test`는 사용자가 명시적으로 요청한 경우에만 작성한다.
 - 사용자가 통합 테스트를 요청한 경우 `MockMvc` 기반으로 HTTP 요청부터 Controller, Service, Repository까지 관통하는 전체 플로우를 검증한다.
+- API 인수 시나리오 테스트는 핵심 사용자 흐름을 실제 HTTP 서버 기준으로 검증할 때 작성한다.
 - Mock 기반 단위 테스트는 기본 선택지가 아니다.
 - 테스트 픽스처는 별도 `fixture` 패키지 또는 `TestFixture` 클래스로 분리한다.
 - 하나의 테스트 메서드에서는 하나의 동작만 검증한다.
@@ -43,7 +44,17 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 │           └── {도메인명}Test.java
 └── integration/
     └── {도메인명}IntegrationTest.java  # 명시 요청 시에만 작성
+└── acceptance/
+    └── {시나리오명}AcceptanceTest.java
 ```
+
+## API 인수 시나리오 테스트 기준
+
+- 회원 가입부터 반려견 등록처럼 여러 도메인 API를 연결하는 핵심 사용자 흐름을 검증한다.
+- `@SpringBootTest(webEnvironment = RANDOM_PORT)`로 실제 내장 서버를 실행하고 HTTP 클라이언트로 요청한다.
+- 외부 인프라는 Testcontainers 또는 테스트 대역을 사용하며, 운영 환경의 외부 서비스에 연결하지 않는다.
+- 상세 입력 검증과 개별 예외 분기는 Controller, Service, 통합 테스트에서 검증하고, 인수 시나리오 테스트는 핵심 흐름 중심으로 제한한다.
+- 시나리오 문서는 `docs/test-scenarios/SCN-xxx-*.md`에 작성한다.
 
 ## 아키텍처 테스트 기준
 
