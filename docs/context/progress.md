@@ -45,6 +45,10 @@
 
 ### 완료
 
+- API 인수 시나리오 테스트 데이터 격리 보완
+  - 변경: SCN-001 종료 후 반려견 멤버십, 체중 이력, 반려견, 회원 데이터를 정리하도록 `@AfterEach` 추가
+  - 배경: 인수 테스트가 남긴 반려견 연관 데이터가 이후 인증 통합 테스트의 회원 삭제를 막아 CI가 실행 순서에 따라 실패하던 문제 해결
+
 - SCN-001 회원 가입부터 반려견 등록까지 API 인수 시나리오 테스트
   - 변경: 실제 임의 포트의 Spring Boot 서버에 HTTP 요청을 보내 회원 가입, 로그인, 내 정보 조회, 반려견 등록 흐름을 검증
   - 변경: Redis Testcontainers와 테스트 데이터 정리로 외부 환경에 의존하지 않는 시나리오 테스트 구성
@@ -57,6 +61,16 @@
   - 관련 문서: `AGENTS.md`
 
 ### 검증
+
+- `./gradlew clean test`
+  - 결과: 성공
+  - 목적: CI와 같은 깨끗한 상태에서 전체 테스트 및 테스트 간 데이터 격리 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs 생성과 Spring Boot JAR 패키징 검증
 
 - `./gradlew test --tests '*MemberPetJourneyAcceptanceTest'`
   - 결과: 성공

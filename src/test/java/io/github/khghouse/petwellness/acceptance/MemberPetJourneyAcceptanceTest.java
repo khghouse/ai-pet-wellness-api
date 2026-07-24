@@ -15,6 +15,7 @@ import io.github.khghouse.petwellness.domain.pet.repository.PetRepository;
 import io.github.khghouse.petwellness.domain.pet.repository.PetWeightRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,15 @@ class MemberPetJourneyAcceptanceTest {
     @BeforeEach
     void setUp() {
         restClient = RestClient.builder().baseUrl("http://localhost:" + port).build();
+        clearTestData();
+    }
+
+    @AfterEach
+    void tearDown() {
+        clearTestData();
+    }
+
+    private void clearTestData() {
         petMembershipRepository.deleteAll();
         petWeightRepository.deleteAll();
         petRepository.deleteAll();
