@@ -60,6 +60,7 @@
 
 - 서비스의 날짜와 시간 기준은 `Asia/Seoul`이다.
 - 날짜만 필요한 값은 `LocalDate`와 `yyyy-MM-dd` 형식을 사용한다.
-- 시각이 필요한 값은 `LocalDateTime`과 `yyyy-MM-dd'T'HH:mm:ss` 형식을 사용한다.
+- 시각이 필요한 값은 `LocalDateTime`과 ISO-8601 형식을 사용하며, 소수 초를 허용한다.
+- 시각 API 값의 예시는 `2026-07-25T14:30:00`, `2026-07-25T14:30:00.123456`이다.
 - 애플리케이션 JVM, H2 테스트 DB, MySQL 연결 세션, CI는 모두 `Asia/Seoul` 기준으로 설정한다.
 - MySQL의 신규 시각 컬럼은 `DATETIME(6)`을 사용한다. 기존 Flyway 마이그레이션의 `TIMESTAMP(6)` 컬럼 전환은 별도 마이그레이션으로 관리한다.
