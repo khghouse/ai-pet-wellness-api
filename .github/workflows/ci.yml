@@ -39,6 +39,7 @@ jobs:
 
       - name: 빌드 및 검증
         env:
+          JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Seoul
           GITHUB_USERNAME: ${{ github.repository_owner }}
           GITHUB_PACKAGES_TOKEN: ${{ secrets.COMMON_MODULES_TOKEN }}
         run: ./gradlew build

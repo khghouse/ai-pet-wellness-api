@@ -55,3 +55,11 @@
 - `BaseEntity`는 `createdAt`, `updatedAt`만 포함한다.
 - 삭제 여부나 삭제일시는 모든 엔티티에 공통으로 두지 않는다.
 - 삭제 정책이 필요한 엔티티는 `deleted`, `deletedAt` 등의 필드를 개별 엔티티에서 정의한다.
+
+## 날짜와 시간
+
+- 서비스의 날짜와 시간 기준은 `Asia/Seoul`이다.
+- 날짜만 필요한 값은 `LocalDate`와 `yyyy-MM-dd` 형식을 사용한다.
+- 시각이 필요한 값은 `LocalDateTime`과 `yyyy-MM-dd'T'HH:mm:ss` 형식을 사용한다.
+- 애플리케이션 JVM, H2 테스트 DB, MySQL 연결 세션, CI는 모두 `Asia/Seoul` 기준으로 설정한다.
+- MySQL의 신규 시각 컬럼은 `DATETIME(6)`을 사용한다. 기존 Flyway 마이그레이션의 `TIMESTAMP(6)` 컬럼 전환은 별도 마이그레이션으로 관리한다.
