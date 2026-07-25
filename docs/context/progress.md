@@ -49,6 +49,7 @@
   - 변경: `POST /api/v1/pets/{petId}/weights`에서 Controller Request와 ServiceRequest를 분리하고 체중 이력 목적의 응답 DTO를 반환
   - 변경: 삭제되지 않은 반려견과 `ACTIVE` 상태의 `OWNER`, `FAMILY` 멤버십만 기록하도록 검증하고, 생년월일 이전 및 미래 측정 시각을 제한
   - 변경: 체중을 소수점 한 자리로 정규화해 요청마다 새 `PetWeight` 이력을 생성하고, Service·Repository 연동, Controller, REST Docs 테스트와 API 문서를 추가
+  - 변경: 코드 리뷰에 따라 관계없는 회원 권한 경계 테스트를 추가하고, 테스트 상태 준비용 도메인 API를 SQL 기반 테스트 픽스처로 대체하며, `petId` 경로 변수를 REST Docs에 문서화
   - 관련 문서: `docs/requirements/pet/REQ-007-pet-weight-record.md`, `src/docs/asciidoc/sections/pet.adoc`
 
 - REQ-007 반려견 체중 기록 요구사항 작성

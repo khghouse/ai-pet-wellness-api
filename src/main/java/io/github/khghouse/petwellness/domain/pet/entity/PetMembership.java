@@ -60,9 +60,4 @@ public class PetMembership extends BaseEntity {
     public static PetMembership createOwner(Member member, Pet pet) {
         return new PetMembership(member, pet, PetMembershipRole.OWNER, PetMembershipStatus.ACTIVE);
     }
-
-    public static PetMembership create(
-            Member member, Pet pet, PetMembershipRole role, PetMembershipStatus status) {
-        return new PetMembership(member, pet, role, status);
-    }
 }

@@ -28,6 +28,10 @@ include::{snippets}/pet-controller-docs-test/register_valid-request_generates-re
 
 include::{snippets}/pet-controller-docs-test/record-weight_valid-request_generates-rest-docs/http-request.adoc[]
 
+==== Path Parameters
+
+include::{snippets}/pet-controller-docs-test/record-weight_valid-request_generates-rest-docs/path-parameters.adoc[]
+
 ==== Request headers
 
 include::{snippets}/pet-controller-docs-test/record-weight_valid-request_generates-rest-docs/request-headers.adoc[]

@@ -23,6 +23,8 @@ import io.github.khghouse.petwellness.domain.pet.repository.PetMembershipReposit
 import io.github.khghouse.petwellness.domain.pet.repository.PetRepository;
 import io.github.khghouse.petwellness.domain.pet.repository.PetWeightRepository;
 import io.github.khghouse.petwellness.support.IntegrationTestSupport;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +43,7 @@ class PetServiceTest extends IntegrationTestSupport {
     @Autowired private PetRepository petRepository;
     @Autowired private PetWeightRepository petWeightRepository;
     @Autowired private PetMembershipRepository petMembershipRepository;
+    @PersistenceContext private EntityManager entityManager;
 
     @DisplayName("정상 요청이면 반려견, 첫 체중 이력과 소유자 멤버십을 생성한다")
     @Test
@@ -125,9 +128,7 @@ class PetServiceTest extends IntegrationTestSupport {
     void recordWeight_familyMembership_persistsWeight() {
         Member member = createMember();
         Pet pet = createPet();
-        petMembershipRepository.save(
-                PetMembership.create(
-                        member, pet, PetMembershipRole.FAMILY, PetMembershipStatus.ACTIVE));
+        saveMembership(member, pet, PetMembershipRole.FAMILY, PetMembershipStatus.ACTIVE);
 
         petService.recordWeight(
                 member.getId(),
@@ -166,9 +167,7 @@ class PetServiceTest extends IntegrationTestSupport {
     void recordWeight_leftMembership_throwsMembershipForbidden() {
         Member member = createMember();
         Pet pet = createPet();
-        petMembershipRepository.save(
-                PetMembership.create(
-                        member, pet, PetMembershipRole.OWNER, PetMembershipStatus.LEFT));
+        saveMembership(member, pet, PetMembershipRole.OWNER, PetMembershipStatus.LEFT);
 
         assertThatThrownBy(
                         () ->
@@ -183,12 +182,33 @@ class PetServiceTest extends IntegrationTestSupport {
                 .isEqualTo(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
     }
 
+    @DisplayName("관계없는 회원은 다른 소유자의 반려견 체중을 기록할 수 없다")
+    @Test
+    void recordWeight_unrelatedMember_throwsMembershipForbidden() {
+        Member owner = createMember("owner@example.com");
+        Member unrelatedMember = createMember("unrelated@example.com");
+        Pet pet = createPet();
+        petMembershipRepository.save(PetMembership.createOwner(owner, pet));
+
+        assertThatThrownBy(
+                        () ->
+                                petService.recordWeight(
+                                        unrelatedMember.getId(),
+                                        pet.getId(),
+                                        new PetWeightRecordServiceRequest(
+                                                new BigDecimal("4.0"),
+                                                LocalDateTime.of(2024, 1, 1, 10, 30))))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
+    }
+
     @DisplayName("존재하지 않거나 삭제된 반려견에는 체중을 기록할 수 없다")
     @Test
     void recordWeight_missingOrDeletedPet_throwsPetNotFound() {
         Member member = createMember();
         Pet pet = createPet();
-        pet.delete();
+        markDeleted(pet.getId());
 
         assertThatThrownBy(
                         () ->
@@ -236,8 +256,12 @@ class PetServiceTest extends IntegrationTestSupport {
     }
 
     private Member createMember() {
-        memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
-        return memberRepository.findByEmail("member@example.com").orElseThrow();
+        return createMember("member@example.com");
+    }
+
+    private Member createMember(String email) {
+        memberService.signup(new MemberSignupServiceRequest(email, "password1"));
+        return memberRepository.findByEmail(email).orElseThrow();
     }
 
     private PetRegistrationServiceRequest registrationRequest(Long breedId) {
@@ -259,5 +283,31 @@ class PetServiceTest extends IntegrationTestSupport {
                         Gender.FEMALE,
                         breed,
                         NeuteredStatus.NEUTERED));
+    }
+
+    private void saveMembership(
+            Member member, Pet pet, PetMembershipRole role, PetMembershipStatus status) {
+        entityManager.flush();
+        entityManager
+                .createNativeQuery(
+                        """
+                        insert into pet_membership (member_id, pet_id, role, status, created_at, updated_at)
+                        values (:memberId, :petId, :role, :status, current_timestamp, current_timestamp)
+                        """)
+                .setParameter("memberId", member.getId())
+                .setParameter("petId", pet.getId())
+                .setParameter("role", role.name())
+                .setParameter("status", status.name())
+                .executeUpdate();
+        entityManager.clear();
+    }
+
+    private void markDeleted(Long petId) {
+        entityManager.flush();
+        entityManager
+                .createNativeQuery("update pet set deleted = true where id = :petId")
+                .setParameter("petId", petId)
+                .executeUpdate();
+        entityManager.clear();
     }
 }

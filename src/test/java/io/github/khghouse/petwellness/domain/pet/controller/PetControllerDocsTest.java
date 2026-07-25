@@ -13,6 +13,8 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.khghouse.common.auth.global.security.AuthPrincipal;
@@ -164,6 +166,7 @@ class PetControllerDocsTest extends RestDocsSupport {
                                 requestHeaders(
                                         headerWithName(HttpHeaders.AUTHORIZATION)
                                                 .description("Bearer Access Token")),
+                                pathParameters(parameterWithName("petId").description("반려견 식별자")),
                                 requestFields(
                                         fieldWithPath("weight")
                                                 .type(NUMBER)
