@@ -49,14 +49,20 @@ public class PetMembership extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PetMembershipStatus status;
 
-    private PetMembership(Member member, Pet pet) {
+    private PetMembership(
+            Member member, Pet pet, PetMembershipRole role, PetMembershipStatus status) {
         this.member = member;
         this.pet = pet;
-        this.role = PetMembershipRole.OWNER;
-        this.status = PetMembershipStatus.ACTIVE;
+        this.role = role;
+        this.status = status;
     }
 
     public static PetMembership createOwner(Member member, Pet pet) {
-        return new PetMembership(member, pet);
+        return new PetMembership(member, pet, PetMembershipRole.OWNER, PetMembershipStatus.ACTIVE);
+    }
+
+    public static PetMembership create(
+            Member member, Pet pet, PetMembershipRole role, PetMembershipStatus status) {
+        return new PetMembership(member, pet, role, status);
     }
 }

@@ -68,4 +68,8 @@ public class Pet extends BaseEntity {
             NeuteredStatus neuteredStatus) {
         return new Pet(name, birthDate, gender, breed, neuteredStatus);
     }
+
+    public void delete() {
+        this.deleted = true;
+    }
 }

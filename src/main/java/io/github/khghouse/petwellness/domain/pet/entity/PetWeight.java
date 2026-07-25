@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,14 +37,20 @@ public class PetWeight {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    private PetWeight(Pet pet, BigDecimal weight, LocalDateTime registeredAt) {
+    private PetWeight(
+            Pet pet, BigDecimal weight, LocalDateTime measuredAt, LocalDateTime createdAt) {
         this.pet = pet;
-        this.weight = weight;
-        this.measuredAt = registeredAt;
-        this.createdAt = registeredAt;
+        this.weight = weight.setScale(1, RoundingMode.UNNECESSARY);
+        this.measuredAt = measuredAt;
+        this.createdAt = createdAt;
     }
 
-    public static PetWeight create(Pet pet, BigDecimal weight, LocalDateTime registeredAt) {
-        return new PetWeight(pet, weight, registeredAt);
+    public static PetWeight create(
+            Pet pet, BigDecimal weight, LocalDateTime measuredAt, LocalDateTime createdAt) {
+        return new PetWeight(pet, weight, measuredAt, createdAt);
+    }
+
+    public static PetWeight create(Pet pet, BigDecimal weight, LocalDateTime measuredAt) {
+        return new PetWeight(pet, weight, measuredAt, measuredAt);
     }
 }

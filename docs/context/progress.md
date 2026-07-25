@@ -45,6 +45,12 @@
 
 ### 완료
 
+- REQ-007 반려견 체중 기록 구현
+  - 변경: `POST /api/v1/pets/{petId}/weights`에서 Controller Request와 ServiceRequest를 분리하고 체중 이력 목적의 응답 DTO를 반환
+  - 변경: 삭제되지 않은 반려견과 `ACTIVE` 상태의 `OWNER`, `FAMILY` 멤버십만 기록하도록 검증하고, 생년월일 이전 및 미래 측정 시각을 제한
+  - 변경: 체중을 소수점 한 자리로 정규화해 요청마다 새 `PetWeight` 이력을 생성하고, Service·Repository 연동, Controller, REST Docs 테스트와 API 문서를 추가
+  - 관련 문서: `docs/requirements/pet/REQ-007-pet-weight-record.md`, `src/docs/asciidoc/sections/pet.adoc`
+
 - REQ-007 반려견 체중 기록 요구사항 작성
   - 변경: `POST /api/v1/pets/{petId}/weights`의 권한, 체중 범위, 측정 시각, 이력 생성 정책과 완료 기준 정의
   - 변경: 체중 기록은 `OWNER`, `FAMILY` 역할의 `ACTIVE` 멤버십만 허용하고, 생년월일 이전 및 미래 측정 시각을 제한
@@ -74,6 +80,13 @@
   - 관련 문서: `AGENTS.md`
 
 ### 검증
+
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
 
 - `./gradlew test --tests '*TimeZoneConfigurationTest'`
   - 결과: 성공

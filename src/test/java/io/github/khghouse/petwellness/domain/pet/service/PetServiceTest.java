@@ -9,9 +9,12 @@ import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationServiceRequest;
+import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.entity.Breed;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
 import io.github.khghouse.petwellness.domain.pet.entity.NeuteredStatus;
+import io.github.khghouse.petwellness.domain.pet.entity.Pet;
+import io.github.khghouse.petwellness.domain.pet.entity.PetMembership;
 import io.github.khghouse.petwellness.domain.pet.entity.PetMembershipRole;
 import io.github.khghouse.petwellness.domain.pet.entity.PetMembershipStatus;
 import io.github.khghouse.petwellness.domain.pet.exception.PetErrorCode;
@@ -22,6 +25,7 @@ import io.github.khghouse.petwellness.domain.pet.repository.PetWeightRepository;
 import io.github.khghouse.petwellness.support.IntegrationTestSupport;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +98,143 @@ class PetServiceTest extends IntegrationTestSupport {
                 .isEqualTo(PetErrorCode.BREED_INACTIVE);
     }
 
+    @DisplayName("소유자 회원은 정수 체중을 소수점 한 자리 이력으로 기록한다")
+    @Test
+    void recordWeight_ownerMembership_persistsNormalizedWeight() {
+        Member member = createMember();
+        Pet pet = createPet();
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+        LocalDateTime measuredAt = LocalDateTime.of(2024, 1, 1, 10, 30);
+
+        var response =
+                petService.recordWeight(
+                        member.getId(),
+                        pet.getId(),
+                        new PetWeightRecordServiceRequest(new BigDecimal("4"), measuredAt));
+
+        assertThat(response.id()).isNotNull();
+        assertThat(response.weight()).isEqualByComparingTo("4.0");
+        assertThat(response.measuredAt()).isEqualTo(measuredAt);
+        assertThat(response.createdAt()).isNotNull();
+        assertThat(petWeightRepository.count()).isEqualTo(1);
+        assertThat(petWeightRepository.findAll().get(0).getWeight()).isEqualByComparingTo("4.0");
+    }
+
+    @DisplayName("가족 회원은 체중 이력을 기록한다")
+    @Test
+    void recordWeight_familyMembership_persistsWeight() {
+        Member member = createMember();
+        Pet pet = createPet();
+        petMembershipRepository.save(
+                PetMembership.create(
+                        member, pet, PetMembershipRole.FAMILY, PetMembershipStatus.ACTIVE));
+
+        petService.recordWeight(
+                member.getId(),
+                pet.getId(),
+                new PetWeightRecordServiceRequest(
+                        new BigDecimal("4.2"), LocalDateTime.of(2024, 1, 1, 10, 30)));
+
+        assertThat(petWeightRepository.count()).isEqualTo(1);
+    }
+
+    @DisplayName("같은 측정 시각으로 요청해도 매번 새 체중 이력을 생성한다")
+    @Test
+    void recordWeight_sameMeasuredAt_persistsSeparateHistories() {
+        Member member = createMember();
+        Pet pet = createPet();
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+        LocalDateTime measuredAt = LocalDateTime.of(2024, 1, 1, 10, 30);
+
+        var first =
+                petService.recordWeight(
+                        member.getId(),
+                        pet.getId(),
+                        new PetWeightRecordServiceRequest(new BigDecimal("4.0"), measuredAt));
+        var second =
+                petService.recordWeight(
+                        member.getId(),
+                        pet.getId(),
+                        new PetWeightRecordServiceRequest(new BigDecimal("4.1"), measuredAt));
+
+        assertThat(first.id()).isNotEqualTo(second.id());
+        assertThat(petWeightRepository.count()).isEqualTo(2);
+    }
+
+    @DisplayName("LEFT 멤버십 회원은 체중을 기록할 수 없다")
+    @Test
+    void recordWeight_leftMembership_throwsMembershipForbidden() {
+        Member member = createMember();
+        Pet pet = createPet();
+        petMembershipRepository.save(
+                PetMembership.create(
+                        member, pet, PetMembershipRole.OWNER, PetMembershipStatus.LEFT));
+
+        assertThatThrownBy(
+                        () ->
+                                petService.recordWeight(
+                                        member.getId(),
+                                        pet.getId(),
+                                        new PetWeightRecordServiceRequest(
+                                                new BigDecimal("4.0"),
+                                                LocalDateTime.of(2024, 1, 1, 10, 30))))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
+    }
+
+    @DisplayName("존재하지 않거나 삭제된 반려견에는 체중을 기록할 수 없다")
+    @Test
+    void recordWeight_missingOrDeletedPet_throwsPetNotFound() {
+        Member member = createMember();
+        Pet pet = createPet();
+        pet.delete();
+
+        assertThatThrownBy(
+                        () ->
+                                petService.recordWeight(
+                                        member.getId(),
+                                        pet.getId(),
+                                        new PetWeightRecordServiceRequest(
+                                                new BigDecimal("4.0"),
+                                                LocalDateTime.of(2024, 1, 1, 10, 30))))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_NOT_FOUND);
+    }
+
+    @DisplayName("생년월일 이전 또는 미래 측정 시각이면 체중 기록에 실패한다")
+    @Test
+    void recordWeight_invalidMeasuredAt_throwsPolicyError() {
+        Member member = createMember();
+        Pet pet = createPet();
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+
+        assertThatThrownBy(
+                        () ->
+                                petService.recordWeight(
+                                        member.getId(),
+                                        pet.getId(),
+                                        new PetWeightRecordServiceRequest(
+                                                new BigDecimal("4.0"),
+                                                LocalDateTime.of(2022, 12, 31, 23, 59))))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.WEIGHT_MEASURED_AT_BEFORE_BIRTH_DATE);
+
+        assertThatThrownBy(
+                        () ->
+                                petService.recordWeight(
+                                        member.getId(),
+                                        pet.getId(),
+                                        new PetWeightRecordServiceRequest(
+                                                new BigDecimal("4.0"),
+                                                LocalDateTime.now().plusMinutes(1))))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.WEIGHT_MEASURED_AT_IN_FUTURE);
+    }
+
     private Member createMember() {
         memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
         return memberRepository.findByEmail("member@example.com").orElseThrow();
@@ -107,5 +248,16 @@ class PetServiceTest extends IntegrationTestSupport {
                 breedId,
                 new BigDecimal("4.5"),
                 NeuteredStatus.NEUTERED);
+    }
+
+    private Pet createPet() {
+        Breed breed = breedRepository.save(Breed.create("체중 테스트 견종", true));
+        return petRepository.save(
+                Pet.create(
+                        "초코",
+                        LocalDate.of(2023, 1, 1),
+                        Gender.FEMALE,
+                        breed,
+                        NeuteredStatus.NEUTERED));
     }
 }

@@ -8,8 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import io.github.khghouse.common.auth.global.security.AuthPrincipal;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationRequest;
+import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.BreedResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
+import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
 import io.github.khghouse.petwellness.domain.pet.entity.NeuteredStatus;
 import io.github.khghouse.petwellness.domain.pet.entity.PetMembershipRole;
@@ -17,6 +19,7 @@ import io.github.khghouse.petwellness.domain.pet.service.PetService;
 import io.github.khghouse.petwellness.support.ControllerTestSupport;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -101,6 +104,57 @@ class PetControllerTest extends ControllerTestSupport {
                                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error.code").value("INVALID_INPUT_VALUE"));
+    }
+
+    @DisplayName("정상 입력이면 반려견 체중 기록에 성공한다")
+    @Test
+    void recordWeight_validRequest_returnsPetWeightRecordResponse() throws Exception {
+        PetWeightRecordRequest request =
+                new PetWeightRecordRequest(
+                        new BigDecimal("4.0"), LocalDateTime.of(2024, 1, 1, 10, 30));
+        given(petService.recordWeight(any(), any(), any()))
+                .willReturn(
+                        new PetWeightRecordResponse(
+                                10L,
+                                new BigDecimal("4.0"),
+                                request.measuredAt(),
+                                LocalDateTime.of(2026, 7, 25, 10, 30)));
+
+        mockMvc.perform(
+                        post("/api/v1/pets/{petId}/weights", 1L)
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data.id").value(10))
+                .andExpect(jsonPath("$.data.weight").value(4.0))
+                .andExpect(jsonPath("$.data.measuredAt").value("2024-01-01T10:30:00"))
+                .andExpect(jsonPath("$.data.createdAt").value("2026-07-25T10:30:00"));
+    }
+
+    @DisplayName("체중 또는 측정 시각 입력이 유효하지 않으면 체중 기록에 실패한다")
+    @Test
+    void recordWeight_invalidRequest_returnsBadRequest() throws Exception {
+        mockMvc.perform(
+                        post("/api/v1/pets/{petId}/weights", 1L)
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"weight\":4.55}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("INVALID_INPUT_VALUE"));
+    }
+
+    @DisplayName("측정 시각 형식이 올바르지 않으면 체중 기록에 실패한다")
+    @Test
+    void recordWeight_invalidMeasuredAtFormat_returnsBadRequest() throws Exception {
+        mockMvc.perform(
+                        post("/api/v1/pets/{petId}/weights", 1L)
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"weight\":4.0,\"measuredAt\":\"invalid\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("MESSAGE_NOT_READABLE"));
     }
 
     private PetRegistrationRequest validRequest() {
