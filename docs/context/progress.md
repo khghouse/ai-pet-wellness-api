@@ -48,6 +48,7 @@
 - SCN-002 회원 탈퇴와 토큰 폐기 API 인수 시나리오 테스트
   - 변경: 실제 임의 포트의 Spring Boot 서버에 HTTP 요청을 보내 회원 가입, 로그인, 회원 탈퇴를 수행하고 기존 Access Token 블랙리스트와 Refresh Token 폐기를 검증
   - 변경: Redis Testcontainers의 토큰 데이터와 회원 데이터를 테스트 전후 정리해 다른 테스트와 격리
+  - 변경: 탈퇴 후 동일한 자격 증명으로 로그인을 재시도해 `INVALID_CREDENTIALS` 오류를 검증
   - 관련 문서: `docs/test-scenarios/SCN-002-member-withdrawal.md`
 
 - REQ-007 반려견 체중 기록 요구사항 작성

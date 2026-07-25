@@ -72,7 +72,7 @@ class MemberWithdrawalAcceptanceTest {
         clearTestData();
     }
 
-    @DisplayName("회원 탈퇴하면 기존 Access Token과 Refresh Token을 사용할 수 없다")
+    @DisplayName("회원 탈퇴하면 로그인과 기존 토큰 사용에 실패한다")
     @Test
     void memberWithdrawal_revokesAccessAndRefreshTokens() throws Exception {
         ResponseEntity<String> signupResponse =
@@ -98,6 +98,13 @@ class MemberWithdrawalAcceptanceTest {
 
         assertThat(withdrawalResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(getResponseBody(withdrawalResponse).get("data").isNull()).isTrue();
+
+        ResponseEntity<String> withdrawnLoginResponse =
+                post(
+                        "/api/auth/login",
+                        new LoginRequest("withdrawal-scenario@example.com", "password1"));
+
+        assertErrorResponse(withdrawnLoginResponse, HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
 
         ResponseEntity<String> getMeResponse = get("/api/v1/members/me", accessToken);
 
