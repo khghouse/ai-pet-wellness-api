@@ -97,7 +97,7 @@ class MemberWithdrawalAcceptanceTest {
         ResponseEntity<String> withdrawalResponse = delete("/api/v1/members/me", accessToken);
 
         assertThat(withdrawalResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(getResponseBody(withdrawalResponse).get("data").isNull()).isTrue();
+        assertThat(getResponseBody(withdrawalResponse).get("data")).isNull();
 
         ResponseEntity<String> withdrawnLoginResponse =
                 post(
