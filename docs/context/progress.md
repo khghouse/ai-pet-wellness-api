@@ -45,6 +45,12 @@
 
 ### 완료
 
+- REQ-007 반려견 체중 기록 요구사항 작성
+  - 변경: `POST /api/v1/pets/{petId}/weights`의 권한, 체중 범위, 측정 시각, 이력 생성 정책과 완료 기준 정의
+  - 변경: 체중 기록은 `OWNER`, `FAMILY` 역할의 `ACTIVE` 멤버십만 허용하고, 생년월일 이전 및 미래 측정 시각을 제한
+  - 변경: 반려동물 도메인 기준 문서와 REQ-006의 최초 체중 정책을 `0.1 ~ 999.9kg`, 소수점 한 자리 기준으로 통일
+  - 관련 문서: `docs/requirements/pet/REQ-007-pet-weight-record.md`, `docs/requirements/pet/README.md`
+
 - 한국 시간대 통일 설정
   - 변경: 애플리케이션과 CI JVM을 `Asia/Seoul`로 고정하고, H2 테스트 DB 세션을 `+09:00`으로 설정
   - 변경: 애플리케이션 시작 시 기본 시간대를 설정하고, 날짜와 시각의 Java 및 API 표현 규칙을 추가
