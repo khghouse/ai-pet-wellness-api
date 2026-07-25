@@ -45,6 +45,13 @@
 
 ### 완료
 
+- 한국 시간대 통일 설정
+  - 변경: 애플리케이션과 CI JVM을 `Asia/Seoul`로 고정하고, H2 테스트 DB 세션을 `+09:00`으로 설정
+  - 변경: 애플리케이션 시작 시 기본 시간대를 설정하고, 날짜와 시각의 Java 및 API 표현 규칙을 추가
+  - 변경: H2 세션 오프셋과 `LocalDateTime` 저장 및 재조회, 시간대 정책을 검증하는 테스트와 ADR 추가
+  - 변경: 코드 리뷰에 따라 실행 방식과 무관한 애플리케이션 시작 시간대 설정, H2 세션 및 저장 재조회 검증 보완
+  - 관련 문서: `docs/adr/0010-use-korean-standard-time.md`, `docs/conventions/coding.md`
+
 - API 인수 시나리오 테스트 데이터 격리 보완
   - 변경: SCN-001 종료 후 반려견 멤버십, 체중 이력, 반려견, 회원 데이터를 정리하도록 `@AfterEach` 추가
   - 배경: 인수 테스트가 남긴 반려견 연관 데이터가 이후 인증 통합 테스트의 회원 삭제를 막아 CI가 실행 순서에 따라 실패하던 문제 해결
@@ -61,6 +68,16 @@
   - 관련 문서: `AGENTS.md`
 
 ### 검증
+
+- `./gradlew test --tests '*TimeZoneConfigurationTest'`
+  - 결과: 성공
+  - 목적: 테스트 JVM의 기본 시간대가 `Asia/Seoul`인지 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: H2 `+09:00` 설정을 포함한 전체 테스트, ArchUnit, Spotless 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs 생성과 Spring Boot JAR 패키징 검증
 
 - `./gradlew clean test`
   - 결과: 성공
