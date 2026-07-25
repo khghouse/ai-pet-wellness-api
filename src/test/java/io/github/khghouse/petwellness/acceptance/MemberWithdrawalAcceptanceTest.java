@@ -133,6 +133,7 @@ class MemberWithdrawalAcceptanceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(objectMapper.writeValueAsString(request))
                 .retrieve()
+                .onStatus(status -> status.isError(), (clientRequest, response) -> {})
                 .toEntity(String.class);
     }
 
@@ -142,6 +143,7 @@ class MemberWithdrawalAcceptanceTest {
                 .uri(uri)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
+                .onStatus(status -> status.isError(), (clientRequest, response) -> {})
                 .toEntity(String.class);
     }
 
@@ -151,6 +153,7 @@ class MemberWithdrawalAcceptanceTest {
                 .uri(uri)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
+                .onStatus(status -> status.isError(), (clientRequest, response) -> {})
                 .toEntity(String.class);
     }
 
