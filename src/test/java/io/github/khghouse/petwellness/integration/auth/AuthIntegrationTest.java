@@ -126,6 +126,14 @@ class AuthIntegrationTest extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.error.code").value("TOKEN_MISSING"));
     }
 
+    @DisplayName("Access Token이 없으면 내 반려견 목록 조회에 실패한다")
+    @Test
+    void getMyPets_withoutAccessToken_returnsTokenMissing() throws Exception {
+        mockMvc.perform(get("/api/v1/pets"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("TOKEN_MISSING"));
+    }
+
     @DisplayName("유효한 Access Token이면 자신의 회원 정보를 조회한다")
     @Test
     void getMe_validAccessToken_returnsAuthenticatedMember() throws Exception {

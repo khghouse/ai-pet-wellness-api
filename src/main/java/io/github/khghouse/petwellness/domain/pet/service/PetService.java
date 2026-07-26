@@ -5,6 +5,7 @@ import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordServiceRequest;
+import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Breed;
@@ -60,6 +61,15 @@ public class PetService {
                         PetWeight.create(
                                 pet, request.weight(), request.measuredAt(), LocalDateTime.now()));
         return PetWeightRecordResponse.from(petWeight);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MyPetResponse> getMyPets(Long memberId) {
+        return petMembershipRepository
+                .findActiveMembershipsWithPetByMemberId(memberId, PetMembershipStatus.ACTIVE)
+                .stream()
+                .map(MyPetResponse::from)
+                .toList();
     }
 
     private Breed getActiveBreed(Long breedId) {

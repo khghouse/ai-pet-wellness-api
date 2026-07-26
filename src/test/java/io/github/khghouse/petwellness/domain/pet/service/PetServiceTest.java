@@ -255,6 +255,51 @@ class PetServiceTest extends IntegrationTestSupport {
                 .isEqualTo(PetErrorCode.WEIGHT_MEASURED_AT_IN_FUTURE);
     }
 
+    @DisplayName("활성 멤버십의 삭제되지 않은 반려견을 최근 등록순으로 조회한다")
+    @Test
+    void getMyPets_activeMemberships_returnsPetsInRecentRegistrationOrder() {
+        Member member = createMember();
+        Member otherMember = createMember("other@example.com");
+        Pet oldestPet = createPet("첫째");
+        Pet sameTimePet = createPet("둘째");
+        Pet newestPet = createPet("셋째");
+        Pet leftPet = createPet("떠난 반려견");
+        Pet deletedPet = createPet("삭제된 반려견");
+        Pet otherMemberPet = createPet("다른 회원 반려견");
+
+        saveMembership(member, oldestPet, PetMembershipRole.OWNER, PetMembershipStatus.ACTIVE);
+        saveMembership(member, sameTimePet, PetMembershipRole.FAMILY, PetMembershipStatus.ACTIVE);
+        saveMembership(member, newestPet, PetMembershipRole.OWNER, PetMembershipStatus.ACTIVE);
+        saveMembership(member, leftPet, PetMembershipRole.FAMILY, PetMembershipStatus.LEFT);
+        saveMembership(member, deletedPet, PetMembershipRole.OWNER, PetMembershipStatus.ACTIVE);
+        saveMembership(
+                otherMember, otherMemberPet, PetMembershipRole.FAMILY, PetMembershipStatus.ACTIVE);
+        setCreatedAt(oldestPet.getId(), LocalDateTime.of(2024, 1, 1, 10, 0));
+        setCreatedAt(sameTimePet.getId(), LocalDateTime.of(2024, 1, 2, 10, 0));
+        setCreatedAt(newestPet.getId(), LocalDateTime.of(2024, 1, 2, 10, 0));
+        markDeleted(deletedPet.getId());
+
+        var responses = petService.getMyPets(member.getId());
+
+        assertThat(responses)
+                .extracting(response -> response.id())
+                .containsExactly(newestPet.getId(), sameTimePet.getId(), oldestPet.getId());
+        assertThat(responses)
+                .extracting(response -> response.membershipRole())
+                .containsExactly(
+                        PetMembershipRole.OWNER, PetMembershipRole.FAMILY, PetMembershipRole.OWNER);
+    }
+
+    @DisplayName("활성 멤버십이 없으면 빈 반려견 목록을 반환한다")
+    @Test
+    void getMyPets_noActiveMembership_returnsEmptyList() {
+        Member member = createMember();
+
+        var responses = petService.getMyPets(member.getId());
+
+        assertThat(responses).isEmpty();
+    }
+
     private Member createMember() {
         return createMember("member@example.com");
     }
@@ -275,10 +320,14 @@ class PetServiceTest extends IntegrationTestSupport {
     }
 
     private Pet createPet() {
-        Breed breed = breedRepository.save(Breed.create("체중 테스트 견종", true));
+        return createPet("초코");
+    }
+
+    private Pet createPet(String name) {
+        Breed breed = breedRepository.save(Breed.create(name + " 견종", true));
         return petRepository.save(
                 Pet.create(
-                        "초코",
+                        name,
                         LocalDate.of(2023, 1, 1),
                         Gender.FEMALE,
                         breed,
@@ -306,6 +355,16 @@ class PetServiceTest extends IntegrationTestSupport {
         entityManager.flush();
         entityManager
                 .createNativeQuery("update pet set deleted = true where id = :petId")
+                .setParameter("petId", petId)
+                .executeUpdate();
+        entityManager.clear();
+    }
+
+    private void setCreatedAt(Long petId, LocalDateTime createdAt) {
+        entityManager.flush();
+        entityManager
+                .createNativeQuery("update pet set created_at = :createdAt where id = :petId")
+                .setParameter("createdAt", createdAt)
                 .setParameter("petId", petId)
                 .executeUpdate();
         entityManager.clear();

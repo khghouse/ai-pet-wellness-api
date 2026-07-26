@@ -2,6 +2,7 @@ package io.github.khghouse.petwellness.domain.pet.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,6 +11,7 @@ import io.github.khghouse.common.auth.global.security.AuthPrincipal;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.BreedResponse;
+import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
@@ -33,6 +35,39 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class PetControllerTest extends ControllerTestSupport {
 
     @MockitoBean private PetService petService;
+
+    @DisplayName("인증된 회원이면 내 반려견 목록을 반환한다")
+    @Test
+    void getMyPets_authenticatedMember_returnsMyPetResponses() throws Exception {
+        given(petService.getMyPets(any()))
+                .willReturn(
+                        List.of(
+                                new MyPetResponse(
+                                        1L,
+                                        "초코",
+                                        LocalDate.of(2023, 1, 1),
+                                        PetMembershipRole.OWNER),
+                                new MyPetResponse(
+                                        2L,
+                                        "보리",
+                                        LocalDate.of(2022, 2, 2),
+                                        PetMembershipRole.FAMILY)));
+
+        mockMvc.perform(get("/api/v1/pets").principal(authenticatedMember()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0].id").value(1))
+                .andExpect(jsonPath("$.data[0].name").value("초코"))
+                .andExpect(jsonPath("$.data[0].birthDate").value("2023-01-01"))
+                .andExpect(jsonPath("$.data[0].membershipRole").value("OWNER"))
+                .andExpect(jsonPath("$.data[0].gender").doesNotExist())
+                .andExpect(jsonPath("$.data[0].breed").doesNotExist())
+                .andExpect(jsonPath("$.data[0].weight").doesNotExist())
+                .andExpect(jsonPath("$.data[0].neuteredStatus").doesNotExist())
+                .andExpect(jsonPath("$.data[0].createdAt").doesNotExist())
+                .andExpect(jsonPath("$.data[0].updatedAt").doesNotExist());
+    }
 
     @DisplayName("정상 입력이면 반려견 등록에 성공한다")
     @Test
