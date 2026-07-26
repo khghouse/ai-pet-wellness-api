@@ -13,12 +13,16 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.khghouse.common.auth.global.security.AuthPrincipal;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationRequest;
+import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.BreedResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
+import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
 import io.github.khghouse.petwellness.domain.pet.entity.NeuteredStatus;
 import io.github.khghouse.petwellness.domain.pet.entity.PetMembershipRole;
@@ -26,6 +30,7 @@ import io.github.khghouse.petwellness.domain.pet.service.PetService;
 import io.github.khghouse.petwellness.support.RestDocsSupport;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -132,6 +137,63 @@ class PetControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.membershipRole")
                                                 .type(STRING)
                                                 .description("생성된 멤버십 역할"))));
+    }
+
+    @DisplayName("반려견 체중 기록 API를 문서화한다")
+    @Test
+    void recordWeight_validRequest_generatesRestDocs() throws Exception {
+        PetWeightRecordRequest request =
+                new PetWeightRecordRequest(
+                        new BigDecimal("4.0"), LocalDateTime.of(2024, 1, 1, 10, 30));
+        given(petService.recordWeight(any(), any(), any()))
+                .willReturn(
+                        new PetWeightRecordResponse(
+                                10L,
+                                new BigDecimal("4.0"),
+                                request.measuredAt(),
+                                LocalDateTime.of(2026, 7, 25, 10, 30)));
+
+        mockMvc.perform(
+                        post("/api/v1/pets/{petId}/weights", 1L)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer access-token")
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "{class-name}/{method-name}",
+                                requestHeaders(
+                                        headerWithName(HttpHeaders.AUTHORIZATION)
+                                                .description("Bearer Access Token")),
+                                pathParameters(parameterWithName("petId").description("반려견 식별자")),
+                                requestFields(
+                                        fieldWithPath("weight")
+                                                .type(NUMBER)
+                                                .description("체중(kg), 0.1~999.9, 소수점 한 자리"),
+                                        fieldWithPath("measuredAt")
+                                                .type(STRING)
+                                                .description("실제 측정 시각 (ISO-8601)")),
+                                responseFields(
+                                        fieldWithPath("status")
+                                                .type(NUMBER)
+                                                .description("HTTP 상태 코드"),
+                                        fieldWithPath("success")
+                                                .type(BOOLEAN)
+                                                .description("요청 성공 여부"),
+                                        fieldWithPath("data").type(OBJECT).description("응답 데이터"),
+                                        fieldWithPath("data.id")
+                                                .type(NUMBER)
+                                                .description("체중 이력 식별자"),
+                                        fieldWithPath("data.weight")
+                                                .type(NUMBER)
+                                                .description("기록 체중(kg)"),
+                                        fieldWithPath("data.measuredAt")
+                                                .type(STRING)
+                                                .description("실제 측정 시각"),
+                                        fieldWithPath("data.createdAt")
+                                                .type(STRING)
+                                                .description("체중 이력 등록 시각"))));
     }
 
     private Authentication authenticatedMember() {

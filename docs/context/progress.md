@@ -45,11 +45,12 @@
 
 ### 완료
 
-- SCN-002 회원 탈퇴와 토큰 폐기 API 인수 시나리오 테스트
-  - 변경: 실제 임의 포트의 Spring Boot 서버에 HTTP 요청을 보내 회원 가입, 로그인, 회원 탈퇴를 수행하고 기존 Access Token 블랙리스트와 Refresh Token 폐기를 검증
-  - 변경: Redis Testcontainers의 토큰 데이터와 회원 데이터를 테스트 전후 정리해 다른 테스트와 격리
-  - 변경: 탈퇴 후 동일한 자격 증명으로 로그인을 재시도해 `INVALID_CREDENTIALS` 오류를 검증
-  - 관련 문서: `docs/test-scenarios/SCN-002-member-withdrawal.md`
+- REQ-007 반려견 체중 기록 구현
+  - 변경: `POST /api/v1/pets/{petId}/weights`에서 Controller Request와 ServiceRequest를 분리하고 체중 이력 목적의 응답 DTO를 반환
+  - 변경: 삭제되지 않은 반려견과 `ACTIVE` 상태의 `OWNER`, `FAMILY` 멤버십만 기록하도록 검증하고, 생년월일 이전 및 미래 측정 시각을 제한
+  - 변경: 체중을 소수점 한 자리로 정규화해 요청마다 새 `PetWeight` 이력을 생성하고, Service·Repository 연동, Controller, REST Docs 테스트와 API 문서를 추가
+  - 변경: 코드 리뷰에 따라 관계없는 회원 권한 경계 테스트를 추가하고, 테스트 상태 준비용 도메인 API를 SQL 기반 테스트 픽스처로 대체하며, `petId` 경로 변수를 REST Docs에 문서화
+  - 관련 문서: `docs/requirements/pet/REQ-007-pet-weight-record.md`, `src/docs/asciidoc/sections/pet.adoc`
 
 - REQ-007 반려견 체중 기록 요구사항 작성
   - 변경: `POST /api/v1/pets/{petId}/weights`의 권한, 체중 범위, 측정 시각, 이력 생성 정책과 완료 기준 정의
@@ -81,18 +82,12 @@
 
 ### 검증
 
-- `./gradlew test --tests '*MemberWithdrawalAcceptanceTest'`
-  - 결과: 성공 (Docker 미제공 환경에서 Testcontainers 시나리오 1건 건너뜀)
-  - 목적: 실제 HTTP 서버와 Redis Testcontainers 환경의 SCN-002 실행 구성 확인
-- `./gradlew spotlessApply`
-  - 결과: 성공
-  - 목적: API 인수 시나리오 테스트 코드 포맷 적용
 - `./gradlew check`
   - 결과: 성공
   - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
 - `./gradlew build`
   - 결과: 성공
-  - 목적: REST Docs 생성과 Spring Boot JAR 패키징 검증
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
 
 - `./gradlew test --tests '*TimeZoneConfigurationTest'`
   - 결과: 성공
