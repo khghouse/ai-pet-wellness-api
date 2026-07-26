@@ -5,7 +5,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
@@ -21,6 +23,7 @@ import io.github.khghouse.common.auth.global.security.AuthPrincipal;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.BreedResponse;
+import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
@@ -47,6 +50,51 @@ class PetControllerDocsTest extends RestDocsSupport {
     @Override
     protected Object initController() {
         return new PetController(petService);
+    }
+
+    @DisplayName("내 반려견 목록 조회 API를 문서화한다")
+    @Test
+    void getMyPets_authenticatedMember_generatesRestDocs() throws Exception {
+        given(petService.getMyPets(any()))
+                .willReturn(
+                        List.of(
+                                new MyPetResponse(
+                                        1L,
+                                        "초코",
+                                        LocalDate.of(2023, 1, 1),
+                                        PetMembershipRole.OWNER)));
+
+        mockMvc.perform(
+                        get("/api/v1/pets")
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer access-token")
+                                .principal(authenticatedMember()))
+                .andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "{class-name}/{method-name}",
+                                requestHeaders(
+                                        headerWithName(HttpHeaders.AUTHORIZATION)
+                                                .description("Bearer Access Token")),
+                                responseFields(
+                                        fieldWithPath("status")
+                                                .type(NUMBER)
+                                                .description("HTTP 상태 코드"),
+                                        fieldWithPath("success")
+                                                .type(BOOLEAN)
+                                                .description("요청 성공 여부"),
+                                        fieldWithPath("data").type(ARRAY).description("반려견 목록"),
+                                        fieldWithPath("data[].id")
+                                                .type(NUMBER)
+                                                .description("반려견 식별자"),
+                                        fieldWithPath("data[].name")
+                                                .type(STRING)
+                                                .description("반려견 이름"),
+                                        fieldWithPath("data[].birthDate")
+                                                .type(STRING)
+                                                .description("생년월일 (yyyy-MM-dd)"),
+                                        fieldWithPath("data[].membershipRole")
+                                                .type(STRING)
+                                                .description("현재 회원의 멤버십 역할"))));
     }
 
     @DisplayName("반려견 등록 API를 문서화한다")
