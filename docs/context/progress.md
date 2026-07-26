@@ -41,6 +41,27 @@
 
 ---
 
+## 2026-07-27
+
+### 완료
+
+- REQ-009 코드 리뷰 반영
+  - 변경: 실제 JWT 보안 필터 체인에서 토큰 없이 활성 견종 목록 API에 접근할 수 있는지 통합 테스트 추가
+  - 변경: 활성 견종이 없을 때 `200 OK`와 빈 배열을 반환하는 Controller 계약 테스트 추가
+  - 변경: REQ-005의 공개 경로와 완료 기준에 `GET /api/v1/breeds` 반영
+  - 관련 문서: `docs/requirements/member/REQ-005-jwt-token-management.md`
+
+### 검증
+
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+
+---
+
 ## 2026-07-26
 
 ### 완료

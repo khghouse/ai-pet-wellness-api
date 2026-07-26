@@ -19,7 +19,7 @@ class BreedControllerTest extends ControllerTestSupport {
 
     @MockitoBean private PetService petService;
 
-    @DisplayName("인증 없이 활성 견종 목록을 반환한다")
+    @DisplayName("활성 견종 목록을 필요한 필드만 반환한다")
     @Test
     void getActiveBreeds_returnsBreedResponses() throws Exception {
         given(petService.getActiveBreeds())
@@ -33,5 +33,17 @@ class BreedControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.data[0].active").doesNotExist())
                 .andExpect(jsonPath("$.data[0].createdAt").doesNotExist())
                 .andExpect(jsonPath("$.data[0].updatedAt").doesNotExist());
+    }
+
+    @DisplayName("활성 견종이 없으면 빈 배열을 반환한다")
+    @Test
+    void getActiveBreeds_noActiveBreed_returnsEmptyArray() throws Exception {
+        given(petService.getActiveBreeds()).willReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/breeds"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(200))
+                .andExpect(jsonPath("$.data").isArray())
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 }

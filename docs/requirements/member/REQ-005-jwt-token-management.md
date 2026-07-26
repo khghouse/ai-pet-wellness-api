@@ -75,6 +75,7 @@
     - 기본적으로 모든 API는 JWT 인증을 요구한다.
     - 아래 경로는 인증 없이 접근할 수 있다.
         - `POST /api/v1/members`
+        - `GET /api/v1/breeds`
         - `POST /api/auth/login`
         - `POST /api/auth/reissue`
         - `/docs/**`
@@ -124,7 +125,7 @@ REDIS_PASSWORD=your-redis-password
     - [ ] 로그아웃한 Access Token으로 보호된 API를 호출하면 실패한다.
     - [ ] Access Token 없이 보호된 API를 호출하면 실패한다.
     - [ ] 유효한 Access Token으로 GET /api/v1/members/me를 호출하면 본인 정보만 조회된다.
-    - [ ] 회원가입, 로그인, 토큰 재발급, API 문서 경로는 인증 없이 접근할 수 있다.
+    - [ ] 회원가입, 활성 견종 목록 조회, 로그인, 토큰 재발급, API 문서 경로는 인증 없이 접근할 수 있다.
     - [ ] 테스트와 CI는 외부 Redis Cloud 연결 없이 실행된다.
 
 - **예외:**
