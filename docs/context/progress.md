@@ -45,13 +45,35 @@
 
 ### 완료
 
+- REQ-008 내 반려견 목록 조회 구현
+  - 변경: `GET /api/v1/pets`에서 현재 인증 회원의 `ACTIVE` 멤버십과 연결된 미삭제 반려견을 최근 등록순으로 반환
+  - 변경: 목록 전용 응답 DTO로 `id`, `name`, `birthDate`, `membershipRole`만 노출하고, REST Docs API 문서 추가
+  - 변경: OWNER·FAMILY 목록 포함, 다른 회원·LEFT 멤버십·삭제 반려견 제외, 동률 시 `id` 내림차순 정렬, 빈 배열, 미인증 요청 및 응답 필드 범위 테스트 추가
+  - 관련 문서: `docs/requirements/pet/REQ-008-my-pet-list.md`, `src/docs/asciidoc/sections/pet.adoc`
+
+- REQ-008 코드 리뷰 반영
+  - 변경: 목록 조회 Repository의 멤버십 상태를 `ACTIVE`로 고정하고, 실제 엔티티-응답 DTO 매핑 테스트에 이름과 생년월일 검증을 추가
+
 - REQ-008, REQ-009 반려동물 조회 요구사항 작성
-  - 변경: 내 반려견 목록의 최소 응답 범위, `ACTIVE` 멤버십 및 삭제 반려견 제외 정책, `id` 내림차순 정렬 기준 정의
+  - 변경: 내 반려견 목록의 최소 응답 범위, `ACTIVE` 멤버십 및 삭제 반려견 제외 정책, 최근 등록순(`createdAt` 내림차순, 동률 시 `id` 내림차순) 정렬 기준 정의
   - 변경: 활성 견종 공개 목록의 응답 범위, 활성 상태 필터, 견종명 오름차순 정렬 기준 정의
   - 변경: 반려동물 도메인 기준 문서에 각 목록 응답의 목적별 필드 범위와 요구사항 링크 추가
   - 관련 문서: `docs/requirements/pet/REQ-008-my-pet-list.md`, `docs/requirements/pet/REQ-009-active-breed-list.md`
 
 ### 검증
+
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: REQ-008을 포함한 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+- `./gradlew test --tests '*PetServiceTest'`
+  - 결과: 성공
+  - 목적: REQ-008의 실제 엔티티-응답 DTO 매핑과 목록 조회 조건 검증
+- `./gradlew test --tests '*AuthIntegrationTest'`
+  - 결과: Docker 미가용으로 11건 건너뜀
+  - 목적: JWT 미인증 반려견 목록 조회의 인증 경계 검증 (Docker 제공 CI에서 실행)
 
 - `git diff --check`
   - 결과: 성공
