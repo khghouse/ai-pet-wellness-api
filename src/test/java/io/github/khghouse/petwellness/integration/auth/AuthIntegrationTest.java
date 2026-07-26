@@ -78,6 +78,15 @@ class AuthIntegrationTest extends IntegrationTestSupport {
                 .andExpect(jsonPath("$.success").value(true));
     }
 
+    @DisplayName("활성 견종 목록 API는 Access Token 없이 접근할 수 있다")
+    @Test
+    void getActiveBreeds_withoutAccessToken_returnsSuccess() throws Exception {
+        mockMvc.perform(get("/api/v1/breeds"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
     @DisplayName("이메일과 비밀번호가 일치하면 Access Token과 Refresh Token을 발급한다")
     @Test
     void login_validCredentials_returnsTokens() throws Exception {

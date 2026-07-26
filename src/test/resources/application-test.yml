@@ -27,6 +27,7 @@ common:
   auth:
     permit-all-paths:
       - /api/v1/members
+      - /api/v1/breeds
       - /api/auth/login
       - /api/auth/reissue
       - /docs/**

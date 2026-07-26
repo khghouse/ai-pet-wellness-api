@@ -41,9 +41,35 @@
 
 ---
 
+## 2026-07-27
+
+### 완료
+
+- REQ-009 코드 리뷰 반영
+  - 변경: 실제 JWT 보안 필터 체인에서 토큰 없이 활성 견종 목록 API에 접근할 수 있는지 통합 테스트 추가
+  - 변경: 활성 견종이 없을 때 `200 OK`와 빈 배열을 반환하는 Controller 계약 테스트 추가
+  - 변경: REQ-005의 공개 경로와 완료 기준에 `GET /api/v1/breeds` 반영
+  - 관련 문서: `docs/requirements/member/REQ-005-jwt-token-management.md`
+
+### 검증
+
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+
+---
+
 ## 2026-07-26
 
 ### 완료
+
+- REQ-009 활성 견종 목록 조회 구현
+  - 변경: 공개 `GET /api/v1/breeds` API에서 활성 견종만 견종명 오름차순으로 조회하고 `id`, `name`만 반환
+  - 변경: 공개 API 경로 설정, Service·Controller·REST Docs 테스트와 API 문서 추가
+  - 관련 문서: `docs/requirements/pet/REQ-009-active-breed-list.md`, `src/docs/asciidoc/sections/pet.adoc`
 
 - REQ-008 내 반려견 목록 조회 구현
   - 변경: `GET /api/v1/pets`에서 현재 인증 회원의 `ACTIVE` 멤버십과 연결된 미삭제 반려견을 최근 등록순으로 반환
@@ -64,6 +90,10 @@
 
 - `./gradlew check`
   - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
   - 목적: REQ-008을 포함한 전체 테스트, ArchUnit, Spotless 포맷 검증
 - `./gradlew build`
   - 결과: 성공

@@ -47,6 +47,30 @@ class PetServiceTest extends IntegrationTestSupport {
     @Autowired private PetMembershipRepository petMembershipRepository;
     @PersistenceContext private EntityManager entityManager;
 
+    @DisplayName("활성 견종만 견종명 오름차순으로 조회한다")
+    @Test
+    void getActiveBreeds_returnsOnlyActiveBreedsSortedByName() {
+        breedRepository.deleteAllInBatch();
+        breedRepository.save(Breed.create("푸들", true));
+        breedRepository.save(Breed.create("비활성 견종", false));
+        breedRepository.save(Breed.create("말티즈", true));
+
+        var responses = petService.getActiveBreeds();
+
+        assertThat(responses).extracting(response -> response.name()).containsExactly("말티즈", "푸들");
+    }
+
+    @DisplayName("활성 견종이 없으면 빈 목록을 반환한다")
+    @Test
+    void getActiveBreeds_noActiveBreed_returnsEmptyList() {
+        breedRepository.deleteAllInBatch();
+        breedRepository.save(Breed.create("비활성 견종", false));
+
+        var responses = petService.getActiveBreeds();
+
+        assertThat(responses).isEmpty();
+    }
+
     @DisplayName("정상 요청이면 반려견, 첫 체중 이력과 소유자 멤버십을 생성한다")
     @Test
     void register_validRequest_persistsPetWeightAndOwnerMembership() {
