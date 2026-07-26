@@ -45,6 +45,12 @@
 
 ### 완료
 
+- QueryDSL 조회 환경 구축 및 반려견 멤버십 조회 전환
+  - 변경: QueryDSL 의존성, Q 클래스 생성 설정, `JPAQueryFactory` 설정을 추가
+  - 변경: Repository 조회는 단순 고정 조건에는 쿼리 메서드, `fetch join` 및 복잡한 조회에는 QueryDSL을 사용하는 규칙을 추가
+  - 변경: `findActiveMembershipsWithPetByMemberId`를 QueryDSL `fetch join`으로 전환하고, Repository 슬라이스 테스트로 정렬과 초기화 상태를 검증
+  - 관련 문서: `docs/conventions/coding.md`, `docs/adr/0011-use-querydsl-for-complex-queries.md`
+
 - REQ-009 코드 리뷰 반영
   - 변경: 실제 JWT 보안 필터 체인에서 토큰 없이 활성 견종 목록 API에 접근할 수 있는지 통합 테스트 추가
   - 변경: 활성 견종이 없을 때 `200 OK`와 빈 배열을 반환하는 Controller 계약 테스트 추가
@@ -52,6 +58,16 @@
   - 관련 문서: `docs/requirements/member/REQ-005-jwt-token-management.md`
 
 ### 검증
+
+- `./gradlew test --tests '*PetMembershipRepositoryTest'`
+  - 결과: 성공
+  - 목적: QueryDSL `fetch join`과 최근 등록순 정렬 검증
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
 
 - `./gradlew check`
   - 결과: 성공

@@ -49,6 +49,21 @@
 - Entity와 공통 Entity는 getter 메서드를 직접 작성하지 않고 Lombok `@Getter`를 사용한다.
 - Entity의 기본 생성자는 Lombok `@NoArgsConstructor(access = AccessLevel.PROTECTED)`를 사용한다.
 
+## Repository 조회 구현 규칙
+
+- 고정된 단순 조건 조회와 존재 여부 확인은 Spring Data JPA 쿼리 메서드를 사용한다.
+  - 예: `findByEmailAndDeletedFalse`
+  - 예: `existsByPetIdAndMemberIdAndStatus`
+- 다음 경우에는 QueryDSL을 사용한다.
+  - `fetch join`이 필요한 조회
+  - 여러 엔티티를 조인하는 조회
+  - DTO Projection 조회
+  - 조건이 선택적으로 조합되는 동적 조회
+  - 쿼리 메서드 이름이 길어져 조회 의도를 명확히 표현하기 어려운 조회
+  - 복잡한 정렬, 집계, 그룹화가 필요한 조회
+- `@Query`를 사용한 JPQL 작성은 지양한다.
+- 네이티브 SQL이 꼭 필요한 경우에는 QueryDSL로 표현하기 어려운 이유와 사용 범위를 검토한 뒤 별도로 결정한다.
+
 ## JPA 공통 엔티티
 
 - 엔티티의 생성일시와 수정일시는 공통 `BaseEntity`에서 관리한다.
