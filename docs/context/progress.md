@@ -45,6 +45,11 @@
 
 ### 완료
 
+- REQ-009 활성 견종 목록 조회 구현
+  - 변경: 공개 `GET /api/v1/breeds` API에서 활성 견종만 견종명 오름차순으로 조회하고 `id`, `name`만 반환
+  - 변경: 공개 API 경로 설정, Service·Controller·REST Docs 테스트와 API 문서 추가
+  - 관련 문서: `docs/requirements/pet/REQ-009-active-breed-list.md`, `src/docs/asciidoc/sections/pet.adoc`
+
 - REQ-008, REQ-009 반려동물 조회 요구사항 작성
   - 변경: 내 반려견 목록의 최소 응답 범위, `ACTIVE` 멤버십 및 삭제 반려견 제외 정책, `id` 내림차순 정렬 기준 정의
   - 변경: 활성 견종 공개 목록의 응답 범위, 활성 상태 필터, 견종명 오름차순 정렬 기준 정의
@@ -52,6 +57,13 @@
   - 관련 문서: `docs/requirements/pet/REQ-008-my-pet-list.md`, `docs/requirements/pet/REQ-009-active-breed-list.md`
 
 ### 검증
+
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
 
 - `git diff --check`
   - 결과: 성공
