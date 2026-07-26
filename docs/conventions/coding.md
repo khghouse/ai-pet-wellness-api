@@ -51,10 +51,13 @@
 
 ## Repository 조회 구현 규칙
 
-- 고정된 단순 조건 조회와 존재 여부 확인은 Spring Data JPA 쿼리 메서드를 사용한다.
+- 조회 구현은 다음 순서로 선택한다.
+  - 메서드 이름만으로 조회 의도를 명확히 표현할 수 있고, `fetch join`이나 DTO Projection이 필요하지 않으면 Spring Data JPA 쿼리 메서드를 사용한다.
+  - 그 외 커스텀 조회는 QueryDSL을 사용한다.
+- 쿼리 메서드 사용 예시는 다음과 같다.
   - 예: `findByEmailAndDeletedFalse`
   - 예: `existsByPetIdAndMemberIdAndStatus`
-- 다음 경우에는 QueryDSL을 사용한다.
+- QueryDSL 사용 예시는 다음과 같다.
   - `fetch join`이 필요한 조회
   - 여러 엔티티를 조인하는 조회
   - DTO Projection 조회

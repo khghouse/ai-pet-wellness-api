@@ -47,9 +47,10 @@
 
 - QueryDSL 조회 환경 구축 및 반려견 멤버십 조회 전환
   - 변경: QueryDSL 의존성, Q 클래스 생성 설정, `JPAQueryFactory` 설정을 추가
-  - 변경: Repository 조회는 단순 고정 조건에는 쿼리 메서드, `fetch join` 및 복잡한 조회에는 QueryDSL을 사용하는 규칙을 추가
+  - 변경: Repository 조회는 쿼리 메서드로 의도를 명확히 표현할 수 있는 경우에만 쿼리 메서드를 사용하고, 그 외 커스텀 조회에는 QueryDSL을 사용하는 규칙을 추가
   - 변경: `findActiveMembershipsWithPetByMemberId`를 QueryDSL `fetch join`으로 전환하고, Repository 슬라이스 테스트로 정렬과 초기화 상태를 검증
-  - 관련 문서: `docs/conventions/coding.md`, `docs/adr/0011-use-querydsl-for-complex-queries.md`
+  - 변경: 코드 리뷰에 따라 Repository fragment 구현체 이름을 `PetMembershipRepositoryCustomImpl`로 변경
+  - 관련 문서: `docs/conventions/coding.md`, `docs/adr/0011-use-querydsl-for-repository-queries.md`
 
 - REQ-009 코드 리뷰 반영
   - 변경: 실제 JWT 보안 필터 체인에서 토큰 없이 활성 견종 목록 API에 접근할 수 있는지 통합 테스트 추가

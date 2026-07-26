@@ -10,7 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class PetMembershipRepositoryImpl implements PetMembershipRepositoryCustom {
+public class PetMembershipRepositoryCustomImpl implements PetMembershipRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
