@@ -115,6 +115,8 @@
 - 재사용이 필요한 경우 `PetSummaryResponse`, `BreedResponse`처럼 작은 응답 DTO를 조합한다.
 - 요청 경로나 인증 정보로 이미 알 수 있는 리소스는 중복해 응답하지 않는다.
 - 반려견 등록 응답은 요청 회원 정보 대신 생성된 반려견과 `membershipRole`을 반환한다.
+- 내 반려견 목록 응답은 `id`, `name`, `birthDate`, `membershipRole`만 반환한다.
+- 활성 견종 목록 응답은 `id`, `name`만 반환한다.
 
 ## 향후 정책
 
@@ -126,3 +128,5 @@
 
 - [REQ-006: 반려견 등록 및 소유자 멤버십 생성](REQ-006-pet-registration.md)
 - [REQ-007: 반려견 체중 기록](REQ-007-pet-weight-record.md)
+- [REQ-008: 내 반려견 목록 조회](REQ-008-my-pet-list.md)
+- [REQ-009: 활성 견종 목록 조회](REQ-009-active-breed-list.md)
