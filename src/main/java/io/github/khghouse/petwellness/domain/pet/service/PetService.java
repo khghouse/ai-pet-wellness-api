@@ -65,9 +65,7 @@ public class PetService {
 
     @Transactional(readOnly = true)
     public List<MyPetResponse> getMyPets(Long memberId) {
-        return petMembershipRepository
-                .findActiveMembershipsWithPetByMemberId(memberId, PetMembershipStatus.ACTIVE)
-                .stream()
+        return petMembershipRepository.findActiveMembershipsWithPetByMemberId(memberId).stream()
                 .map(MyPetResponse::from)
                 .toList();
     }

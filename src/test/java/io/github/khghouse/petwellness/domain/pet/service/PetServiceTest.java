@@ -2,6 +2,7 @@ package io.github.khghouse.petwellness.domain.pet.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.groups.Tuple.tuple;
 
 import io.github.khghouse.common.core.global.exception.CustomException;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
@@ -10,6 +11,7 @@ import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordServiceRequest;
+import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Breed;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
 import io.github.khghouse.petwellness.domain.pet.entity.NeuteredStatus;
@@ -282,12 +284,27 @@ class PetServiceTest extends IntegrationTestSupport {
         var responses = petService.getMyPets(member.getId());
 
         assertThat(responses)
-                .extracting(response -> response.id())
-                .containsExactly(newestPet.getId(), sameTimePet.getId(), oldestPet.getId());
-        assertThat(responses)
-                .extracting(response -> response.membershipRole())
+                .extracting(
+                        MyPetResponse::id,
+                        MyPetResponse::name,
+                        MyPetResponse::birthDate,
+                        MyPetResponse::membershipRole)
                 .containsExactly(
-                        PetMembershipRole.OWNER, PetMembershipRole.FAMILY, PetMembershipRole.OWNER);
+                        tuple(
+                                newestPet.getId(),
+                                "셋째",
+                                LocalDate.of(2023, 1, 1),
+                                PetMembershipRole.OWNER),
+                        tuple(
+                                sameTimePet.getId(),
+                                "둘째",
+                                LocalDate.of(2023, 1, 1),
+                                PetMembershipRole.FAMILY),
+                        tuple(
+                                oldestPet.getId(),
+                                "첫째",
+                                LocalDate.of(2023, 1, 1),
+                                PetMembershipRole.OWNER));
     }
 
     @DisplayName("활성 멤버십이 없으면 빈 반려견 목록을 반환한다")

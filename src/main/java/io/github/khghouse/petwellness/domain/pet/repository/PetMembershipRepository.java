@@ -23,10 +23,9 @@ public interface PetMembershipRepository extends JpaRepository<PetMembership, Lo
             from PetMembership petMembership
             join fetch petMembership.pet pet
             where petMembership.member.id = :memberId
-                and petMembership.status = :status
+                and petMembership.status = io.github.khghouse.petwellness.domain.pet.entity.PetMembershipStatus.ACTIVE
                 and pet.deleted = false
             order by pet.createdAt desc, pet.id desc
             """)
-    List<PetMembership> findActiveMembershipsWithPetByMemberId(
-            @Param("memberId") Long memberId, @Param("status") PetMembershipStatus status);
+    List<PetMembership> findActiveMembershipsWithPetByMemberId(@Param("memberId") Long memberId);
 }
