@@ -51,21 +51,20 @@
 
 ## Repository 조회 구현 규칙
 
-- 조회 구현은 다음 순서로 선택한다.
-  - 메서드 이름만으로 조회 의도를 명확히 표현할 수 있고, `fetch join`이나 DTO Projection이 필요하지 않으면 Spring Data JPA 쿼리 메서드를 사용한다.
-  - 그 외 커스텀 조회는 QueryDSL을 사용한다.
-- 쿼리 메서드 사용 예시는 다음과 같다.
-  - 예: `findByEmailAndDeletedFalse`
-  - 예: `existsByPetIdAndMemberIdAndStatus`
-- QueryDSL 사용 예시는 다음과 같다.
-  - `fetch join`이 필요한 조회
-  - 여러 엔티티를 조인하는 조회
-  - DTO Projection 조회
-  - 조건이 선택적으로 조합되는 동적 조회
-  - 쿼리 메서드 이름이 길어져 조회 의도를 명확히 표현하기 어려운 조회
-  - 복잡한 정렬, 집계, 그룹화가 필요한 조회
-- `@Query`를 사용한 JPQL 작성은 지양한다.
-- 네이티브 SQL이 꼭 필요한 경우에는 QueryDSL로 표현하기 어려운 이유와 사용 범위를 검토한 뒤 별도로 결정한다.
+| 상황 | 구현 방식 |
+| --- | --- |
+| 단일 엔티티의 고정 조건 조회 | 쿼리 메서드 |
+| 단순 존재 여부 및 개수 확인 | 쿼리 메서드 |
+| 고정 정렬이 포함되지만 메서드 이름만으로 조회 의도를 명확히 표현할 수 있는 경우 | 쿼리 메서드 |
+| 명시적인 `fetch join` 필요 | QueryDSL |
+| 연관 엔티티 조건 또는 정렬 사용 | QueryDSL |
+| 동적 조건 조합 | QueryDSL |
+| DTO Projection | QueryDSL |
+| 서브쿼리, 집계, 그룹화 | QueryDSL |
+| DB 종속 기능 또는 QueryDSL로 표현하기 매우 어려운 조회 | 예외적으로 native query |
+
+- `@Query` 기반 JPQL은 기본 선택지로 사용하지 않는다.
+- native query가 필요한 경우에는 사용 이유와 범위를 기록한 뒤 사용한다.
 
 ## JPA 공통 엔티티
 

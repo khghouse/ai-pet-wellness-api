@@ -50,6 +50,7 @@
   - 변경: Repository 조회는 쿼리 메서드로 의도를 명확히 표현할 수 있는 경우에만 쿼리 메서드를 사용하고, 그 외 커스텀 조회에는 QueryDSL을 사용하는 규칙을 추가
   - 변경: `findActiveMembershipsWithPetByMemberId`를 QueryDSL `fetch join`으로 전환하고, Repository 슬라이스 테스트로 정렬과 초기화 상태를 검증
   - 변경: 코드 리뷰에 따라 Repository fragment 구현체 이름을 `PetMembershipRepositoryCustomImpl`로 변경
+  - 변경: 코드 리뷰 논의를 반영해 쿼리 메서드와 QueryDSL 선택 기준, native query 예외 기준을 구체화
   - 관련 문서: `docs/conventions/coding.md`, `docs/adr/0011-use-querydsl-for-repository-queries.md`
 
 - REQ-009 코드 리뷰 반영

@@ -12,10 +12,12 @@ Spring Data JPA 쿼리 메서드는 고정된 단순 조건 조회에 적합하�
 
 ## 결정
 
-- 메서드 이름만으로 조회 의도를 명확히 표현할 수 있고, `fetch join`이나 DTO Projection이 필요하지 않으면 Spring Data JPA 쿼리 메서드를 사용한다.
-- 그 외 커스텀 조회는 QueryDSL로 구현한다.
+- 단일 엔티티의 고정 조건 조회, 존재 여부 및 개수 확인은 Spring Data JPA 쿼리 메서드를 사용한다.
+- 고정 정렬이 포함되더라도 메서드 이름만으로 조회 의도를 명확히 표현할 수 있으면 쿼리 메서드를 사용한다.
+- 명시적인 `fetch join`, 연관 엔티티 조건 또는 정렬, 동적 조건, DTO Projection, 서브쿼리, 집계 및 그룹화가 필요한 조회는 QueryDSL을 사용한다.
 - `@Query`를 사용한 JPQL 작성은 지양한다.
 - QueryDSL 구현은 Repository fragment 인터페이스와 `{FragmentName}Impl` 구현체로 분리한다.
+- QueryDSL로 표현하기 어렵거나 가독성이 현저히 낮아지는 DB 종속 조회는 사용 이유와 범위를 기록한 뒤 native query를 사용할 수 있다.
 
 ## 결과
 
