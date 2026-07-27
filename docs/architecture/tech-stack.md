@@ -3,7 +3,7 @@
 - 언어: Java 17
 - 프레임워크: Spring Boot 4.0.6
 - 빌드 도구: Gradle
-- ORM: Spring Data JPA / Hibernate
+- ORM: Spring Data JPA / Hibernate / QueryDSL
 - 데이터베이스:
   - 로컬 / 테스트: H2
   - 개발 / 운영: MySQL 8.x

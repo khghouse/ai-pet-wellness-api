@@ -70,7 +70,7 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 |---|---|
 | `ControllerTestSupport` | 보안 필터를 제외한 Controller MVC 계약 테스트 |
 | `IntegrationTestSupport` | Service + Repository 실제 연동 테스트 및 명시 요청된 MockMvc 기반 전체 플로우 통합 테스트 |
-| `RepositoryTestSupport` | JPA / Querydsl Repository 슬라이스 테스트 |
+| `RepositoryTestSupport` | JPA / QueryDSL Repository 슬라이스 테스트 |
 
 ### IntegrationTestSupport
 
@@ -84,7 +84,7 @@ src/test/java/{패키지 경로}/{프로젝트명}/
 ### RepositoryTestSupport
 
 - `@DataJpaTest` + `@ActiveProfiles("test")`
-- Querydsl 사용 시 `@Import(QuerydslConfig.class)` 추가
+- QueryDSL 사용 시 `@Import(QuerydslConfig.class)` 추가
 - `@Import(JpaAuditingConfig.class)`를 반드시 포함한다.
 
 ### ControllerTestSupport
