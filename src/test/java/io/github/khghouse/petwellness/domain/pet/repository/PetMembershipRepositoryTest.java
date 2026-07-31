@@ -51,6 +51,11 @@ class PetMembershipRepositoryTest extends RepositoryTestSupport {
                 .allSatisfy(
                         membership ->
                                 assertThat(Hibernate.isInitialized(membership.getPet())).isTrue());
+        assertThat(memberships)
+                .allSatisfy(
+                        membership ->
+                                assertThat(Hibernate.isInitialized(membership.getMember()))
+                                        .isFalse());
     }
 
     private Pet createPet(String name, Breed breed) {

@@ -41,6 +41,33 @@
 
 ---
 
+## 2026-08-01
+
+### 완료
+
+- 반려견 체중 검증 및 멤버십 fetch 전략 보완
+  - 변경: 반려견 등록 체중을 `0.1~999.9kg`, 소수점 한 자리로 제한하고 경계값 및 실패 테스트 추가
+  - 변경: `PetWeight` 생성 시 체중 범위와 소수점 자릿수를 검증해 API 외부 생성 경로에서도 도메인 규칙 보장
+  - 변경: `PetMembership`의 `member`, `pet` 연관관계를 LAZY로 변경
+  - 변경: QueryDSL 목록 조회 후 `pet`만 초기화되고 `member`는 초기화되지 않는지 검증
+  - 변경: 반려견 등록 REST Docs의 체중 범위 설명 보완
+  - 변경: 코드 리뷰에 따라 체중 정책 위반을 `CustomException(WEIGHT_INVALID)`으로 통일하고 원래 입력의 소수점 자릿수를 검증
+  - 관련 문서: `docs/requirements/pet/REQ-006-pet-registration.md`
+
+### 검증
+
+- `./gradlew test --tests '*PetControllerTest' --tests '*PetWeightTest' --tests '*PetMembershipRepositoryTest'`
+  - 결과: 성공
+  - 목적: 체중 입력 경계와 엔티티 불변식, LAZY 및 `fetch join` 동작 검증
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+
+---
+
 ## 2026-07-27
 
 ### 완료
