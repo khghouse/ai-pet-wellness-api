@@ -51,6 +51,7 @@
   - 변경: `PetMembership`의 `member`, `pet` 연관관계를 LAZY로 변경
   - 변경: QueryDSL 목록 조회 후 `pet`만 초기화되고 `member`는 초기화되지 않는지 검증
   - 변경: 반려견 등록 REST Docs의 체중 범위 설명 보완
+  - 변경: 코드 리뷰에 따라 체중 정책 위반을 `CustomException(WEIGHT_INVALID)`으로 통일하고 원래 입력의 소수점 자릿수를 검증
   - 관련 문서: `docs/requirements/pet/REQ-006-pet-registration.md`
 
 ### 검증

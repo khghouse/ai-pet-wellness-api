@@ -1,5 +1,7 @@
 package io.github.khghouse.petwellness.domain.pet.entity;
 
+import io.github.khghouse.common.core.global.exception.CustomException;
+import io.github.khghouse.petwellness.domain.pet.exception.PetErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -61,8 +63,8 @@ public class PetWeight {
         if (weight == null
                 || weight.compareTo(MIN_WEIGHT) < 0
                 || weight.compareTo(MAX_WEIGHT) > 0
-                || weight.stripTrailingZeros().scale() > 1) {
-            throw new IllegalArgumentException("체중은 0.1kg 이상 999.9kg 이하이며 소수점 한 자리여야 합니다.");
+                || weight.scale() > 1) {
+            throw new CustomException(PetErrorCode.WEIGHT_INVALID);
         }
         return weight.setScale(1, RoundingMode.UNNECESSARY);
     }

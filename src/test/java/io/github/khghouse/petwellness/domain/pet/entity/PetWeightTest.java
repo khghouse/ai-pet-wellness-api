@@ -3,6 +3,8 @@ package io.github.khghouse.petwellness.domain.pet.entity;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.khghouse.common.core.global.exception.CustomException;
+import io.github.khghouse.petwellness.domain.pet.exception.PetErrorCode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,11 +24,13 @@ class PetWeightTest {
 
     @DisplayName("체중 범위 또는 소수점 자릿수가 유효하지 않으면 체중 이력을 생성할 수 없다")
     @ParameterizedTest
-    @ValueSource(strings = {"0", "1000.0", "4.55"})
-    void create_invalidWeight_throwsIllegalArgumentException(String weight) {
+    @ValueSource(strings = {"0", "1000.0", "4.55", "4.50", "4.500"})
+    void create_invalidWeight_throwsWeightInvalid(String weight) {
         assertThatThrownBy(
                         () -> PetWeight.create(createPet(), new BigDecimal(weight), measuredAt()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.WEIGHT_INVALID);
     }
 
     private Pet createPet() {

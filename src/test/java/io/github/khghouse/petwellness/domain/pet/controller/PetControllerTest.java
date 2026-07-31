@@ -139,7 +139,7 @@ class PetControllerTest extends ControllerTestSupport {
 
     @DisplayName("체중 범위 또는 소수점 자릿수가 유효하지 않으면 반려견 등록에 실패한다")
     @ParameterizedTest
-    @ValueSource(strings = {"0", "1000.0", "4.55"})
+    @ValueSource(strings = {"0", "1000.0", "4.55", "4.50", "4.500"})
     void register_invalidWeight_returnsBadRequest(String weight) throws Exception {
         PetRegistrationRequest request = registrationRequest(new BigDecimal(weight));
 
