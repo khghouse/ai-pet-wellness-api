@@ -15,6 +15,7 @@ import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.entity.MemberStatus;
 import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
+import io.github.khghouse.petwellness.fixture.MemberTestFixture;
 import io.github.khghouse.petwellness.support.IntegrationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -116,7 +117,7 @@ class AuthIntegrationTest extends IntegrationTestSupport {
     @Test
     void login_withdrawnMember_returnsUnauthorized() throws Exception {
         Member member = signup("member@example.com");
-        memberService.withdraw(member.getId());
+        MemberTestFixture.withdraw(memberRepository, member.getId());
         LoginRequest request = new LoginRequest("member@example.com", "password1");
 
         mockMvc.perform(
@@ -195,7 +196,7 @@ class AuthIntegrationTest extends IntegrationTestSupport {
     void reissue_withdrawnMember_returnsUnauthorized() throws Exception {
         Member member = signup("member@example.com");
         TokenPair tokens = login("member@example.com", "password1");
-        memberService.withdraw(member.getId());
+        MemberTestFixture.withdraw(memberRepository, member.getId());
         ReissueRequest request = new ReissueRequest(tokens.refreshToken());
 
         mockMvc.perform(

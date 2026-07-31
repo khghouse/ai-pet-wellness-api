@@ -2,19 +2,23 @@ package io.github.khghouse.petwellness.domain.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.then;
 
+import io.github.khghouse.common.auth.domain.auth.service.AuthService;
 import io.github.khghouse.common.core.global.exception.CustomException;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
 import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.entity.MemberStatus;
 import io.github.khghouse.petwellness.domain.member.exception.MemberErrorCode;
 import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
+import io.github.khghouse.petwellness.fixture.MemberTestFixture;
 import io.github.khghouse.petwellness.support.IntegrationTestSupport;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -27,6 +31,8 @@ class MemberServiceTest extends IntegrationTestSupport {
     @Autowired private PasswordEncoder passwordEncoder;
 
     @Autowired private EntityManager entityManager;
+
+    @MockitoBean private AuthService authService;
 
     @DisplayName("정상 입력이면 회원을 생성하고 비밀번호를 단방향 해시로 저장한다")
     @Test
@@ -94,7 +100,7 @@ class MemberServiceTest extends IntegrationTestSupport {
         // given
         memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
         Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
-        memberService.withdraw(member.getId());
+        MemberTestFixture.withdraw(memberRepository, member.getId());
 
         // when & then
         assertThatThrownBy(() -> memberService.getMember(member.getId()))
@@ -103,15 +109,15 @@ class MemberServiceTest extends IntegrationTestSupport {
                 .isEqualTo(MemberErrorCode.MEMBER_WITHDRAWN);
     }
 
-    @DisplayName("정상 요청이면 회원을 탈퇴 상태로 변경한다")
+    @DisplayName("정상 요청이면 회원을 탈퇴 상태로 변경하고 인증 토큰을 폐기한다")
     @Test
-    void withdraw_validRequest_updatesMemberWithdrawalState() {
+    void withdraw_validRequest_updatesStateAndRevokesTokens() {
         // given
         memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
         Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
 
         // when
-        memberService.withdraw(member.getId());
+        memberService.withdraw(member.getId(), "access-token");
         entityManager.flush();
         entityManager.clear();
 
@@ -120,13 +126,14 @@ class MemberServiceTest extends IntegrationTestSupport {
         assertThat(withdrawnMember.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
         assertThat(withdrawnMember.isDeleted()).isTrue();
         assertThat(withdrawnMember.getDeletedAt()).isNotNull();
+        then(authService).should().logout("access-token", member.getId());
     }
 
     @DisplayName("존재하지 않는 회원이면 회원 탈퇴에 실패한다")
     @Test
     void withdraw_notFoundMember_throwsMemberNotFound() {
         // when & then
-        assertThatThrownBy(() -> memberService.withdraw(999L))
+        assertThatThrownBy(() -> memberService.withdraw(999L, "access-token"))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode")
                 .isEqualTo(MemberErrorCode.MEMBER_NOT_FOUND);
@@ -138,10 +145,10 @@ class MemberServiceTest extends IntegrationTestSupport {
         // given
         memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
         Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
-        memberService.withdraw(member.getId());
+        MemberTestFixture.withdraw(memberRepository, member.getId());
 
         // when & then
-        assertThatThrownBy(() -> memberService.withdraw(member.getId()))
+        assertThatThrownBy(() -> memberService.withdraw(member.getId(), "access-token"))
                 .isInstanceOf(CustomException.class)
                 .extracting("errorCode")
                 .isEqualTo(MemberErrorCode.MEMBER_ALREADY_WITHDRAWN);
