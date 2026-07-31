@@ -144,7 +144,7 @@ class PetControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("breedId").type(NUMBER).description("견종 식별자"),
                                         fieldWithPath("weight")
                                                 .type(NUMBER)
-                                                .description("체중(kg), 소수점 한 자리"),
+                                                .description("체중(kg), 0.1~999.9, 소수점 한 자리"),
                                         fieldWithPath("neuteredStatus")
                                                 .type(STRING)
                                                 .description(

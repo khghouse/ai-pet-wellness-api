@@ -25,6 +25,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -120,17 +122,26 @@ class PetControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.error.code").value("INVALID_INPUT_VALUE"));
     }
 
-    @DisplayName("유효하지 않은 체중이면 반려견 등록에 실패한다")
-    @Test
-    void register_invalidWeight_returnsBadRequest() throws Exception {
-        PetRegistrationRequest request =
-                new PetRegistrationRequest(
-                        "초코",
-                        LocalDate.of(2023, 1, 1),
-                        Gender.FEMALE,
-                        1L,
-                        new BigDecimal("4.55"),
-                        NeuteredStatus.NEUTERED);
+    @DisplayName("체중 경계값이면 반려견 등록에 성공한다")
+    @ParameterizedTest
+    @ValueSource(strings = {"0.1", "999.9"})
+    void register_weightBoundary_returnsPetRegistrationResponse(String weight) throws Exception {
+        PetRegistrationRequest request = registrationRequest(new BigDecimal(weight));
+        given(petService.register(any(), any())).willReturn(response());
+
+        mockMvc.perform(
+                        post("/api/v1/pets")
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+    }
+
+    @DisplayName("체중 범위 또는 소수점 자릿수가 유효하지 않으면 반려견 등록에 실패한다")
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "1000.0", "4.55"})
+    void register_invalidWeight_returnsBadRequest(String weight) throws Exception {
+        PetRegistrationRequest request = registrationRequest(new BigDecimal(weight));
 
         mockMvc.perform(
                         post("/api/v1/pets")
@@ -193,13 +204,12 @@ class PetControllerTest extends ControllerTestSupport {
     }
 
     private PetRegistrationRequest validRequest() {
+        return registrationRequest(new BigDecimal("4.5"));
+    }
+
+    private PetRegistrationRequest registrationRequest(BigDecimal weight) {
         return new PetRegistrationRequest(
-                "초코",
-                LocalDate.of(2023, 1, 1),
-                Gender.FEMALE,
-                1L,
-                new BigDecimal("4.5"),
-                NeuteredStatus.NEUTERED);
+                "초코", LocalDate.of(2023, 1, 1), Gender.FEMALE, 1L, weight, NeuteredStatus.NEUTERED);
     }
 
     private PetRegistrationResponse response() {

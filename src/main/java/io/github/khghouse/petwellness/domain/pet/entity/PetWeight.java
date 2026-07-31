@@ -20,6 +20,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PetWeight {
 
+    private static final BigDecimal MIN_WEIGHT = new BigDecimal("0.1");
+    private static final BigDecimal MAX_WEIGHT = new BigDecimal("999.9");
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -40,7 +43,7 @@ public class PetWeight {
     private PetWeight(
             Pet pet, BigDecimal weight, LocalDateTime measuredAt, LocalDateTime createdAt) {
         this.pet = pet;
-        this.weight = weight.setScale(1, RoundingMode.UNNECESSARY);
+        this.weight = validateAndNormalizeWeight(weight);
         this.measuredAt = measuredAt;
         this.createdAt = createdAt;
     }
@@ -52,5 +55,15 @@ public class PetWeight {
 
     public static PetWeight create(Pet pet, BigDecimal weight, LocalDateTime measuredAt) {
         return new PetWeight(pet, weight, measuredAt, measuredAt);
+    }
+
+    private static BigDecimal validateAndNormalizeWeight(BigDecimal weight) {
+        if (weight == null
+                || weight.compareTo(MIN_WEIGHT) < 0
+                || weight.compareTo(MAX_WEIGHT) > 0
+                || weight.stripTrailingZeros().scale() > 1) {
+            throw new IllegalArgumentException("체중은 0.1kg 이상 999.9kg 이하이며 소수점 한 자리여야 합니다.");
+        }
+        return weight.setScale(1, RoundingMode.UNNECESSARY);
     }
 }
