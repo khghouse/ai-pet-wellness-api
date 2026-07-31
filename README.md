@@ -16,7 +16,7 @@ AI 에이전트 기반 개발 흐름과 하네스 엔지니어링을 학습하�
 - Java 17
 - Spring Boot 4.0.6
 - Gradle
-- Spring Data JPA / Hibernate
+- Spring Data JPA / Hibernate / QueryDSL
 - MySQL 8.x
 - H2
 - Flyway
