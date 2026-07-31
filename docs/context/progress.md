@@ -45,6 +45,12 @@
 
 ### 완료
 
+- CI Testcontainers 실행 환경 보장 및 기술 스택 문서 정합성 보완
+  - 변경: GitHub Actions 빌드 전에 `docker info`를 실행해 Docker 미가용 시 CI가 즉시 실패하도록 구성
+  - 변경: Docker가 제공되는 CI에서 인증 통합 테스트와 API 인수 시나리오 테스트가 조용히 생략되지 않도록 실행 조건 보완
+  - 변경: README 기술 스택에 QueryDSL 반영
+  - 관련 문서: `README.md`, `.github/workflows/ci.yml`
+
 - 회원 탈퇴 토큰 폐기 불변식 보완
   - 변경: 토큰을 폐기하지 않는 `MemberService.withdraw(Long)` 공개 메서드 제거
   - 변경: 운영 탈퇴 경로를 회원 상태 변경과 `AuthService.logout`을 함께 수행하는 메서드로 통일
@@ -62,6 +68,16 @@
   - 관련 문서: `docs/requirements/pet/REQ-006-pet-registration.md`
 
 ### 검증
+
+- `docker info`
+  - 결과: 성공
+  - 목적: Testcontainers 실행에 필요한 Docker daemon 확인
+- `./gradlew clean test`
+  - 결과: 성공
+  - 목적: 캐시를 제거하고 전체 테스트를 실제로 실행
+- Testcontainers 테스트 결과 확인
+  - 결과: `AuthIntegrationTest` 12건, `MemberPetJourneyAcceptanceTest` 1건, `MemberWithdrawalAcceptanceTest` 1건 모두 `skipped=0`, 실패 0건
+  - 목적: Docker 기반 핵심 통합 테스트가 생략되지 않았는지 확인
 
 - `./gradlew test --tests '*MemberServiceTest' --tests '*MemberAuthUserReaderTest'`
   - 결과: 성공

@@ -37,6 +37,9 @@ jobs:
         with:
           cache-provider: basic
 
+      - name: Docker 실행 환경 확인
+        run: docker info
+
       - name: 빌드 및 검증
         env:
           JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Seoul
