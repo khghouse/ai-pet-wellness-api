@@ -45,6 +45,13 @@
 
 ### 완료
 
+- 회원 탈퇴 토큰 폐기 불변식 보완
+  - 변경: 토큰을 폐기하지 않는 `MemberService.withdraw(Long)` 공개 메서드 제거
+  - 변경: 운영 탈퇴 경로를 회원 상태 변경과 `AuthService.logout`을 함께 수행하는 메서드로 통일
+  - 변경: Service 테스트에서 실제 회원 DB 상태 변경과 토큰 폐기 호출을 함께 검증
+  - 변경: 탈퇴 상태가 필요한 테스트는 Repository와 Entity 기반 `MemberTestFixture`를 사용하도록 분리
+  - 관련 문서: `docs/requirements/member/REQ-003-withdrawal.md`, `docs/requirements/member/REQ-005-jwt-token-management.md`
+
 - 반려견 체중 검증 및 멤버십 fetch 전략 보완
   - 변경: 반려견 등록 체중을 `0.1~999.9kg`, 소수점 한 자리로 제한하고 경계값 및 실패 테스트 추가
   - 변경: `PetWeight` 생성 시 체중 범위와 소수점 자릿수를 검증해 API 외부 생성 경로에서도 도메인 규칙 보장
@@ -55,6 +62,13 @@
   - 관련 문서: `docs/requirements/pet/REQ-006-pet-registration.md`
 
 ### 검증
+
+- `./gradlew test --tests '*MemberServiceTest' --tests '*MemberAuthUserReaderTest'`
+  - 결과: 성공
+  - 목적: 회원 상태 변경, 토큰 폐기 호출과 탈퇴 회원 인증 조회 차단 검증
+- `./gradlew test --tests '*AuthIntegrationTest'`
+  - 결과: 성공
+  - 목적: Redis와 보안 필터를 포함한 회원 탈퇴 및 토큰 폐기 계약 검증
 
 - `./gradlew test --tests '*PetControllerTest' --tests '*PetWeightTest' --tests '*PetMembershipRepositoryTest'`
   - 결과: 성공

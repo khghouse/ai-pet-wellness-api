@@ -51,11 +51,6 @@ public class MemberService {
     }
 
     @Transactional
-    public void withdraw(Long memberId) {
-        withdrawMember(memberId);
-    }
-
-    @Transactional
     public void withdraw(Long memberId, String accessToken) {
         withdrawMember(memberId);
         authService.logout(accessToken, memberId);

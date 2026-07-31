@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServiceRequest;
 import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
+import io.github.khghouse.petwellness.fixture.MemberTestFixture;
 import io.github.khghouse.petwellness.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ class MemberAuthUserReaderTest extends IntegrationTestSupport {
         // given
         memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
         Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
-        memberService.withdraw(member.getId());
+        MemberTestFixture.withdraw(memberRepository, member.getId());
 
         // when
         var authUser = memberAuthUserReader.findByUsername("member@example.com");
@@ -58,7 +59,7 @@ class MemberAuthUserReaderTest extends IntegrationTestSupport {
         // given
         memberService.signup(new MemberSignupServiceRequest("member@example.com", "password1"));
         Member member = memberRepository.findByEmail("member@example.com").orElseThrow();
-        memberService.withdraw(member.getId());
+        MemberTestFixture.withdraw(memberRepository, member.getId());
 
         // when
         var authUser = memberAuthUserReader.findById(member.getId());
