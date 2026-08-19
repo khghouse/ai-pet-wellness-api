@@ -41,6 +41,22 @@
 
 ---
 
+## 2026-08-19
+
+### 완료
+
+- REQ-010, REQ-011 반려견 수정 및 삭제 요구사항 작성
+  - 변경: 반려견 정보 전체 수정, 소프트 삭제, 소유자 권한, 비활성 견종 유지 및 변경 제한 정책을 정의
+  - 변경: 삭제 시 활성 멤버십을 `INACTIVE`로 종료하고, 기존 `LEFT` 상태값을 `INACTIVE`로 통일
+  - 변경: 진행 중인 산책이 있으면 삭제를 `409 Conflict`로 거절하고, 산책 도메인 구현 시 실제 검증을 연결하도록 정의
+  - 관련 문서: `docs/requirements/pet/REQ-010-pet-information-update.md`, `docs/requirements/pet/REQ-011-pet-deletion.md`, `docs/requirements/pet/README.md`
+
+### 인수인계 메모
+
+- 산책 도메인을 구현할 때 진행 중인 산책이 있는 반려견의 삭제를 `409 Conflict`로 거절하는 정책을 연결한다.
+
+---
+
 ## 2026-08-01
 
 ### 완료

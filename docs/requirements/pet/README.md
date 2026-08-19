@@ -15,7 +15,7 @@
   - `updatedAt`: 수정일시, `BaseEntity`에서 관리
 - **정책:**
   - 견종은 직접 입력하지 않고 기준 데이터에서 선택한다.
-  - 비활성 견종은 신규 등록 시 선택할 수 없지만, 기존 반려견의 견종 이력은 유지한다.
+  - 비활성 견종은 신규 등록 또는 견종 변경 시 선택할 수 없지만, 기존 반려견의 견종 이력은 유지한다.
   - 견종 기준 데이터는 삭제하지 않고 `active` 상태로 관리한다.
   - 초기 견종 데이터는 Flyway 마이그레이션으로 등록한다.
 
@@ -35,6 +35,10 @@
 - **상태값:**
   - `gender`: `MALE`, `FEMALE`, `UNKNOWN`
   - `neuteredStatus`: `NEUTERED`, `NOT_NEUTERED`, `UNKNOWN`
+- **삭제 정책:**
+  - 반려견 삭제는 `deleted = true`로 처리한다.
+  - 삭제된 반려견은 현재 조회와 관리 대상에서 제외하지만, 체중, 산책, 미션, 리워드의 과거 이력은 보존한다.
+  - 진행 중인 산책이 있으면 반려견을 삭제할 수 없으며, 산책 종료 후 다시 삭제를 요청해야 한다.
 
 ### PetWeight
 
@@ -66,11 +70,13 @@
   - `updatedAt`: 수정일시, `BaseEntity`에서 관리
 - **상태값:**
   - `role`: `OWNER`, `FAMILY`
-  - `status`: `ACTIVE`, `LEFT`
+  - `status`: `ACTIVE`, `INACTIVE`
 - **정책:**
   - 동일 회원과 동일 반려견의 멤버십은 하나만 존재한다.
   - 반려견당 `OWNER` 멤버십은 하나만 존재한다.
   - 반려견 등록 회원은 `OWNER`, `ACTIVE` 멤버십으로 생성된다.
+  - `INACTIVE` 멤버십은 종료된 관계를 의미하며, 반려견 조회와 관리 권한을 가지지 않는다.
+  - 반려견 삭제 시 해당 반려견의 `ACTIVE` 멤버십은 `INACTIVE`로 변경한다.
 
 ## 관계
 
@@ -117,6 +123,7 @@
 - 반려견 등록 응답은 요청 회원 정보 대신 생성된 반려견과 `membershipRole`을 반환한다.
 - 내 반려견 목록 응답은 `id`, `name`, `birthDate`, `membershipRole`만 반환한다.
 - 활성 견종 목록 응답은 `id`, `name`만 반환한다.
+- 반려견 정보 수정 응답은 `id`, `name`, `birthDate`, `gender`, `breed`, `neuteredStatus`, `updatedAt`을 반환한다.
 
 ## 향후 정책
 
@@ -130,3 +137,5 @@
 - [REQ-007: 반려견 체중 기록](REQ-007-pet-weight-record.md)
 - [REQ-008: 내 반려견 목록 조회](REQ-008-my-pet-list.md)
 - [REQ-009: 활성 견종 목록 조회](REQ-009-active-breed-list.md)
+- [REQ-010: 반려견 정보 수정](REQ-010-pet-information-update.md)
+- [REQ-011: 반려견 삭제](REQ-011-pet-deletion.md)
