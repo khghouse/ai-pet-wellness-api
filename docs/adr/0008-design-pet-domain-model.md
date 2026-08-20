@@ -13,7 +13,7 @@
 ## 결정
 
 - 회원과 반려견의 관계는 직접 연결하지 않고 `PetMembership` 연관 엔티티로 관리한다.
-- `PetMembership`은 `OWNER`, `FAMILY` 역할과 `ACTIVE`, `INACTIVE` 상태를 가진다.
+- `PetMembership`은 `OWNER`, `FAMILY` 역할과 `ACTIVE`, `LEFT` 상태를 가진다.
 - 반려견 등록 시 등록 회원의 `OWNER`, `ACTIVE` 멤버십을 함께 생성한다.
 - 견종은 `Breed` 기준 데이터로 관리하고, 신규 등록 가능 여부는 `active`로 관리한다.
 - 반려견 체중은 `PetWeight` 추가 전용 이력으로 관리한다.
