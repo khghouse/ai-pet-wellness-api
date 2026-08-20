@@ -14,4 +14,7 @@ public interface PetMembershipRepository
             Long petId,
             Collection<PetMembershipRole> roles,
             PetMembershipStatus status);
+
+    boolean existsByMemberIdAndPetIdAndRoleAndStatus(
+            Long memberId, Long petId, PetMembershipRole role, PetMembershipStatus status);
 }

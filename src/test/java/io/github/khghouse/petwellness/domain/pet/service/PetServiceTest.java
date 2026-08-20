@@ -9,6 +9,7 @@ import io.github.khghouse.petwellness.domain.member.dto.request.MemberSignupServ
 import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.repository.MemberRepository;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
+import io.github.khghouse.petwellness.domain.pet.dto.request.PetInformationUpdateServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
@@ -19,6 +20,7 @@ import io.github.khghouse.petwellness.domain.pet.entity.Pet;
 import io.github.khghouse.petwellness.domain.pet.entity.PetMembership;
 import io.github.khghouse.petwellness.domain.pet.entity.PetMembershipRole;
 import io.github.khghouse.petwellness.domain.pet.entity.PetMembershipStatus;
+import io.github.khghouse.petwellness.domain.pet.entity.PetWeight;
 import io.github.khghouse.petwellness.domain.pet.exception.PetErrorCode;
 import io.github.khghouse.petwellness.domain.pet.repository.BreedRepository;
 import io.github.khghouse.petwellness.domain.pet.repository.PetMembershipRepository;
@@ -341,6 +343,186 @@ class PetServiceTest extends IntegrationTestSupport {
         assertThat(responses).isEmpty();
     }
 
+    @DisplayName("활성 소유자 회원은 체중 이력을 유지하며 반려견 기본 정보를 수정한다")
+    @Test
+    void updateInformation_ownerMembership_updatesPetAndKeepsWeightHistories() {
+        Member member = createMember();
+        Breed currentBreed = breedRepository.save(Breed.create("기존 견종", true));
+        Breed newBreed = breedRepository.save(Breed.create("변경 견종", true));
+        Pet pet = createPet("초코", currentBreed);
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+        petWeightRepository.save(
+                PetWeight.create(pet, new BigDecimal("4.5"), LocalDateTime.of(2024, 1, 1, 10, 0)));
+
+        var response =
+                petService.updateInformation(
+                        member.getId(),
+                        pet.getId(),
+                        updateRequest(LocalDate.of(2023, 1, 1), newBreed.getId()));
+
+        assertThat(response.name()).isEqualTo("보리");
+        assertThat(response.breed().id()).isEqualTo(newBreed.getId());
+        assertThat(response.updatedAt()).isNotNull();
+        assertThat(petWeightRepository.findAll())
+                .extracting(PetWeight::getWeight, PetWeight::getMeasuredAt)
+                .containsExactly(tuple(new BigDecimal("4.5"), LocalDateTime.of(2024, 1, 1, 10, 0)));
+    }
+
+    @DisplayName("소유자가 아닌 회원은 반려견 정보를 수정할 수 없다")
+    @Test
+    void updateInformation_nonOwnerMembership_throwsMembershipForbidden() {
+        Member owner = createMember("owner@example.com");
+        Member family = createMember("family@example.com");
+        Pet pet = createPet();
+        petMembershipRepository.save(PetMembership.createOwner(owner, pet));
+        saveMembership(family, pet, PetMembershipRole.FAMILY, PetMembershipStatus.ACTIVE);
+
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        family.getId(),
+                                        pet.getId(),
+                                        updateRequest(
+                                                LocalDate.of(2023, 1, 1), pet.getBreed().getId())))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
+    }
+
+    @DisplayName("종료되었거나 관계없는 회원은 반려견 정보를 수정할 수 없다")
+    @Test
+    void updateInformation_leftOrUnrelatedMembership_throwsMembershipForbidden() {
+        Member leftOwner = createMember("left-owner@example.com");
+        Member unrelatedMember = createMember("unrelated@example.com");
+        Pet pet = createPet();
+        saveMembership(leftOwner, pet, PetMembershipRole.OWNER, PetMembershipStatus.LEFT);
+
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        leftOwner.getId(),
+                                        pet.getId(),
+                                        updateRequest(
+                                                LocalDate.of(2023, 1, 1), pet.getBreed().getId())))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        unrelatedMember.getId(),
+                                        pet.getId(),
+                                        updateRequest(
+                                                LocalDate.of(2023, 1, 1), pet.getBreed().getId())))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
+    }
+
+    @DisplayName("존재하지 않거나 삭제된 반려견은 수정할 수 없다")
+    @Test
+    void updateInformation_missingOrDeletedPet_throwsPetNotFound() {
+        Member member = createMember();
+        Pet pet = createPet();
+        Long breedId = pet.getBreed().getId();
+        markDeleted(pet.getId());
+
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        member.getId(),
+                                        pet.getId(),
+                                        updateRequest(LocalDate.of(2023, 1, 1), breedId)))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_NOT_FOUND);
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        member.getId(),
+                                        999L,
+                                        updateRequest(LocalDate.of(2023, 1, 1), breedId)))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_NOT_FOUND);
+    }
+
+    @DisplayName("첫 체중 측정일보다 미래인 생년월일로 변경할 수 없다")
+    @Test
+    void updateInformation_birthDateAfterFirstWeight_throwsBirthDatePolicyError() {
+        Member member = createMember();
+        Pet pet = createPet();
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+        petWeightRepository.save(
+                PetWeight.create(pet, new BigDecimal("4.0"), LocalDateTime.of(2024, 1, 1, 10, 0)));
+
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        member.getId(),
+                                        pet.getId(),
+                                        updateRequest(
+                                                LocalDate.of(2024, 1, 2), pet.getBreed().getId())))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.PET_BIRTH_DATE_AFTER_WEIGHT_MEASURED_AT);
+    }
+
+    @DisplayName("현재 연결된 비활성 견종을 유지하는 수정은 성공한다")
+    @Test
+    void updateInformation_currentInactiveBreed_updatesPet() {
+        Member member = createMember();
+        Breed inactiveBreed = breedRepository.save(Breed.create("비활성 견종", false));
+        Pet pet = createPet("초코", inactiveBreed);
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+
+        var response =
+                petService.updateInformation(
+                        member.getId(),
+                        pet.getId(),
+                        updateRequest(LocalDate.of(2023, 1, 1), inactiveBreed.getId()));
+
+        assertThat(response.breed().id()).isEqualTo(inactiveBreed.getId());
+    }
+
+    @DisplayName("다른 비활성 견종으로 변경할 수 없다")
+    @Test
+    void updateInformation_differentInactiveBreed_throwsBreedInactive() {
+        Member member = createMember();
+        Pet pet = createPet();
+        Breed inactiveBreed = breedRepository.save(Breed.create("비활성 견종", false));
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        member.getId(),
+                                        pet.getId(),
+                                        updateRequest(
+                                                LocalDate.of(2023, 1, 1), inactiveBreed.getId())))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.BREED_INACTIVE);
+    }
+
+    @DisplayName("존재하지 않는 견종으로 변경할 수 없다")
+    @Test
+    void updateInformation_missingBreed_throwsBreedNotFound() {
+        Member member = createMember();
+        Pet pet = createPet();
+        petMembershipRepository.save(PetMembership.createOwner(member, pet));
+
+        assertThatThrownBy(
+                        () ->
+                                petService.updateInformation(
+                                        member.getId(),
+                                        pet.getId(),
+                                        updateRequest(LocalDate.of(2023, 1, 1), 999L)))
+                .isInstanceOf(CustomException.class)
+                .extracting("errorCode")
+                .isEqualTo(PetErrorCode.BREED_NOT_FOUND);
+    }
+
     private Member createMember() {
         return createMember("member@example.com");
     }
@@ -366,6 +548,10 @@ class PetServiceTest extends IntegrationTestSupport {
 
     private Pet createPet(String name) {
         Breed breed = breedRepository.save(Breed.create(name + " 견종", true));
+        return createPet(name, breed);
+    }
+
+    private Pet createPet(String name, Breed breed) {
         return petRepository.save(
                 Pet.create(
                         name,
@@ -373,6 +559,11 @@ class PetServiceTest extends IntegrationTestSupport {
                         Gender.FEMALE,
                         breed,
                         NeuteredStatus.NEUTERED));
+    }
+
+    private PetInformationUpdateServiceRequest updateRequest(LocalDate birthDate, Long breedId) {
+        return new PetInformationUpdateServiceRequest(
+                "보리", birthDate, Gender.MALE, breedId, NeuteredStatus.NOT_NEUTERED);
     }
 
     private void saveMembership(

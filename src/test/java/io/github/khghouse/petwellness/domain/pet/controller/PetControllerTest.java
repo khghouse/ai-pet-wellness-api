@@ -4,14 +4,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.khghouse.common.auth.global.security.AuthPrincipal;
+import io.github.khghouse.petwellness.domain.pet.dto.request.PetInformationUpdateRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.BreedResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
+import io.github.khghouse.petwellness.domain.pet.dto.response.PetInformationUpdateResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
@@ -203,8 +206,74 @@ class PetControllerTest extends ControllerTestSupport {
                 .andExpect(jsonPath("$.error.code").value("MESSAGE_NOT_READABLE"));
     }
 
+    @DisplayName("정상 입력이면 반려견 정보 수정에 성공한다")
+    @Test
+    void updateInformation_validRequest_returnsPetInformationUpdateResponse() throws Exception {
+        PetInformationUpdateRequest request = updateRequest();
+        given(petService.updateInformation(any(), any(), any()))
+                .willReturn(
+                        new PetInformationUpdateResponse(
+                                1L,
+                                "보리",
+                                LocalDate.of(2023, 1, 1),
+                                Gender.MALE,
+                                new BreedResponse(2L, "푸들"),
+                                NeuteredStatus.NOT_NEUTERED,
+                                LocalDateTime.of(2026, 8, 20, 10, 0)));
+
+        mockMvc.perform(
+                        put("/api/v1/pets/{petId}", 1L)
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.name").value("보리"))
+                .andExpect(jsonPath("$.data.breed.name").value("푸들"))
+                .andExpect(jsonPath("$.data.updatedAt").value("2026-08-20T10:00:00"))
+                .andExpect(jsonPath("$.data.weight").doesNotExist())
+                .andExpect(jsonPath("$.data.membershipRole").doesNotExist());
+    }
+
+    @DisplayName("필수 입력값이 누락되면 반려견 정보 수정에 실패한다")
+    @Test
+    void updateInformation_missingRequiredField_returnsBadRequest() throws Exception {
+        mockMvc.perform(
+                        put("/api/v1/pets/{petId}", 1L)
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"name\":\"보리\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("INVALID_INPUT_VALUE"));
+    }
+
+    @DisplayName("미래 생년월일이면 반려견 정보 수정에 실패한다")
+    @Test
+    void updateInformation_futureBirthDate_returnsBadRequest() throws Exception {
+        PetInformationUpdateRequest request =
+                new PetInformationUpdateRequest(
+                        "보리",
+                        LocalDate.now().plusDays(1),
+                        Gender.MALE,
+                        2L,
+                        NeuteredStatus.NOT_NEUTERED);
+
+        mockMvc.perform(
+                        put("/api/v1/pets/{petId}", 1L)
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("INVALID_INPUT_VALUE"));
+    }
+
     private PetRegistrationRequest validRequest() {
         return registrationRequest(new BigDecimal("4.5"));
+    }
+
+    private PetInformationUpdateRequest updateRequest() {
+        return new PetInformationUpdateRequest(
+                "보리", LocalDate.of(2023, 1, 1), Gender.MALE, 2L, NeuteredStatus.NOT_NEUTERED);
     }
 
     private PetRegistrationRequest registrationRequest(BigDecimal weight) {

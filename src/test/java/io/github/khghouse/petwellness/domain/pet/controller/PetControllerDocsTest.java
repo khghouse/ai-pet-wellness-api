@@ -7,6 +7,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -20,10 +21,12 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.khghouse.common.auth.global.security.AuthPrincipal;
+import io.github.khghouse.petwellness.domain.pet.dto.request.PetInformationUpdateRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.BreedResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
+import io.github.khghouse.petwellness.domain.pet.dto.response.PetInformationUpdateResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Gender;
@@ -242,6 +245,89 @@ class PetControllerDocsTest extends RestDocsSupport {
                                         fieldWithPath("data.createdAt")
                                                 .type(STRING)
                                                 .description("체중 이력 등록 시각"))));
+    }
+
+    @DisplayName("반려견 정보 수정 API를 문서화한다")
+    @Test
+    void updateInformation_validRequest_generatesRestDocs() throws Exception {
+        PetInformationUpdateRequest request =
+                new PetInformationUpdateRequest(
+                        "보리",
+                        LocalDate.of(2023, 1, 1),
+                        Gender.MALE,
+                        2L,
+                        NeuteredStatus.NOT_NEUTERED);
+        given(petService.updateInformation(any(), any(), any()))
+                .willReturn(
+                        new PetInformationUpdateResponse(
+                                1L,
+                                "보리",
+                                LocalDate.of(2023, 1, 1),
+                                Gender.MALE,
+                                new BreedResponse(2L, "푸들"),
+                                NeuteredStatus.NOT_NEUTERED,
+                                LocalDateTime.of(2026, 8, 20, 10, 0)));
+
+        mockMvc.perform(
+                        put("/api/v1/pets/{petId}", 1L)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer access-token")
+                                .principal(authenticatedMember())
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andDo(
+                        document(
+                                "{class-name}/{method-name}",
+                                requestHeaders(
+                                        headerWithName(HttpHeaders.AUTHORIZATION)
+                                                .description("Bearer Access Token")),
+                                pathParameters(parameterWithName("petId").description("반려견 식별자")),
+                                requestFields(
+                                        fieldWithPath("name").type(STRING).description("반려견 이름"),
+                                        fieldWithPath("birthDate")
+                                                .type(STRING)
+                                                .description("생년월일 (yyyy-MM-dd)"),
+                                        fieldWithPath("gender")
+                                                .type(STRING)
+                                                .description("성별: MALE, FEMALE, UNKNOWN"),
+                                        fieldWithPath("breedId").type(NUMBER).description("견종 식별자"),
+                                        fieldWithPath("neuteredStatus")
+                                                .type(STRING)
+                                                .description(
+                                                        "중성화 상태: NEUTERED, NOT_NEUTERED, UNKNOWN")),
+                                responseFields(
+                                        fieldWithPath("status")
+                                                .type(NUMBER)
+                                                .description("HTTP 상태 코드"),
+                                        fieldWithPath("success")
+                                                .type(BOOLEAN)
+                                                .description("요청 성공 여부"),
+                                        fieldWithPath("data").type(OBJECT).description("응답 데이터"),
+                                        fieldWithPath("data.id")
+                                                .type(NUMBER)
+                                                .description("반려견 식별자"),
+                                        fieldWithPath("data.name")
+                                                .type(STRING)
+                                                .description("반려견 이름"),
+                                        fieldWithPath("data.birthDate")
+                                                .type(STRING)
+                                                .description("생년월일"),
+                                        fieldWithPath("data.gender").type(STRING).description("성별"),
+                                        fieldWithPath("data.breed")
+                                                .type(OBJECT)
+                                                .description("견종 정보"),
+                                        fieldWithPath("data.breed.id")
+                                                .type(NUMBER)
+                                                .description("견종 식별자"),
+                                        fieldWithPath("data.breed.name")
+                                                .type(STRING)
+                                                .description("견종명"),
+                                        fieldWithPath("data.neuteredStatus")
+                                                .type(STRING)
+                                                .description("중성화 상태"),
+                                        fieldWithPath("data.updatedAt")
+                                                .type(STRING)
+                                                .description("수정 일시 (ISO-8601)"))));
     }
 
     private Authentication authenticatedMember() {

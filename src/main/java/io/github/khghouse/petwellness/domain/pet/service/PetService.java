@@ -3,10 +3,12 @@ package io.github.khghouse.petwellness.domain.pet.service;
 import io.github.khghouse.common.core.global.exception.CustomException;
 import io.github.khghouse.petwellness.domain.member.entity.Member;
 import io.github.khghouse.petwellness.domain.member.service.MemberService;
+import io.github.khghouse.petwellness.domain.pet.dto.request.PetInformationUpdateServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetRegistrationServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.request.PetWeightRecordServiceRequest;
 import io.github.khghouse.petwellness.domain.pet.dto.response.BreedResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.MyPetResponse;
+import io.github.khghouse.petwellness.domain.pet.dto.response.PetInformationUpdateResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetRegistrationResponse;
 import io.github.khghouse.petwellness.domain.pet.dto.response.PetWeightRecordResponse;
 import io.github.khghouse.petwellness.domain.pet.entity.Breed;
@@ -20,6 +22,7 @@ import io.github.khghouse.petwellness.domain.pet.repository.BreedRepository;
 import io.github.khghouse.petwellness.domain.pet.repository.PetMembershipRepository;
 import io.github.khghouse.petwellness.domain.pet.repository.PetRepository;
 import io.github.khghouse.petwellness.domain.pet.repository.PetWeightRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +74,24 @@ public class PetService {
         return PetWeightRecordResponse.from(petWeight);
     }
 
+    @Transactional
+    public PetInformationUpdateResponse updateInformation(
+            Long memberId, Long petId, PetInformationUpdateServiceRequest request) {
+        Pet pet = getActivePet(petId);
+        validateOwnerPermission(memberId, petId);
+        validateBirthDate(petId, request.birthDate());
+        Breed breed = getUpdateBreed(pet.getBreed(), request.breedId());
+
+        pet.update(
+                request.name(),
+                request.birthDate(),
+                request.gender(),
+                breed,
+                request.neuteredStatus());
+        petRepository.flush();
+        return PetInformationUpdateResponse.from(pet);
+    }
+
     @Transactional(readOnly = true)
     public List<MyPetResponse> getMyPets(Long memberId) {
         return petMembershipRepository.findActiveMembershipsWithPetByMemberId(memberId).stream()
@@ -106,6 +127,36 @@ public class PetService {
         if (!hasPermission) {
             throw new CustomException(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
         }
+    }
+
+    private void validateOwnerPermission(Long memberId, Long petId) {
+        boolean hasPermission =
+                petMembershipRepository.existsByMemberIdAndPetIdAndRoleAndStatus(
+                        memberId, petId, PetMembershipRole.OWNER, PetMembershipStatus.ACTIVE);
+        if (!hasPermission) {
+            throw new CustomException(PetErrorCode.PET_MEMBERSHIP_FORBIDDEN);
+        }
+    }
+
+    private void validateBirthDate(Long petId, LocalDate birthDate) {
+        if (birthDate.isAfter(LocalDate.now())) {
+            throw new CustomException(PetErrorCode.PET_BIRTH_DATE_IN_FUTURE);
+        }
+        petWeightRepository
+                .findFirstByPetIdOrderByMeasuredAtAscIdAsc(petId)
+                .filter(petWeight -> birthDate.isAfter(petWeight.getMeasuredAt().toLocalDate()))
+                .ifPresent(
+                        petWeight -> {
+                            throw new CustomException(
+                                    PetErrorCode.PET_BIRTH_DATE_AFTER_WEIGHT_MEASURED_AT);
+                        });
+    }
+
+    private Breed getUpdateBreed(Breed currentBreed, Long requestedBreedId) {
+        if (currentBreed.getId().equals(requestedBreedId)) {
+            return currentBreed;
+        }
+        return getActiveBreed(requestedBreedId);
     }
 
     private void validateMeasuredAt(Pet pet, LocalDateTime measuredAt) {
