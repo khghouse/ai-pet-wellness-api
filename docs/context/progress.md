@@ -51,6 +51,15 @@
   - 변경: 진행 중인 산책 확인과 삭제 제한, 삭제와 수정 또는 산책 시작의 동시성 정책은 산책 도메인 설계 시 결정하도록 백로그로 분리
   - 관련 문서: `docs/requirements/pet/REQ-010-pet-information-update.md`, `docs/requirements/pet/REQ-011-pet-deletion.md`, `docs/requirements/pet/README.md`
 
+### 검증
+
+- `git diff --check`
+  - 결과: 성공
+  - 목적: 요구사항 문서 변경의 공백 오류 확인
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+
 ### 인수인계 메모
 
 - 산책 도메인을 구현할 때 반려견 삭제 제한과 동시성 정책을 `backlog.md`의 반려견 삭제와 산책 상태 연동 설계 항목에 따라 결정한다.
