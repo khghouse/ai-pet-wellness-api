@@ -68,4 +68,17 @@ public class Pet extends BaseEntity {
             NeuteredStatus neuteredStatus) {
         return new Pet(name, birthDate, gender, breed, neuteredStatus);
     }
+
+    public void update(
+            String name,
+            LocalDate birthDate,
+            Gender gender,
+            Breed breed,
+            NeuteredStatus neuteredStatus) {
+        this.name = name;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.breed = breed;
+        this.neuteredStatus = neuteredStatus;
+    }
 }

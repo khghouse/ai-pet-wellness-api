@@ -41,6 +41,30 @@
 
 ---
 
+## 2026-08-20
+
+### 완료
+
+- REQ-010 반려견 정보 수정 구현
+  - 변경: `PUT /api/v1/pets/{petId}`에서 활성 `OWNER` 멤버십 회원만 반려견의 이름, 생년월일, 성별, 견종, 중성화 상태를 전체 수정하도록 구현
+  - 변경: 생년월일의 미래 날짜 및 첫 체중 측정일 이후 변경을 차단하고, 현재 비활성 견종의 유지는 허용하되 다른 비활성 견종으로의 변경은 차단
+  - 변경: 수정 목적 응답 DTO와 REST Docs를 추가하고, 체중 이력이 응답이나 수정 대상에 포함되지 않도록 검증
+  - 관련 문서: `docs/requirements/pet/REQ-010-pet-information-update.md`, `src/docs/asciidoc/sections/pet.adoc`
+
+### 검증
+
+- `./gradlew test --tests '*PetServiceTest' --tests '*PetControllerTest' --tests '*PetControllerDocsTest' --tests '*AuthIntegrationTest'`
+  - 결과: 성공
+  - 목적: 수정 정책, HTTP 계약, REST Docs 검증 (`AuthIntegrationTest`는 로컬 Docker 미가용으로 13건 건너뜀)
+- `./gradlew check`
+  - 결과: 성공
+  - 목적: 전체 테스트, ArchUnit, Spotless 포맷 검증
+- `./gradlew build`
+  - 결과: 성공
+  - 목적: REST Docs HTML 생성과 Spring Boot JAR 패키징 검증
+
+---
+
 ## 2026-08-19
 
 ### 완료

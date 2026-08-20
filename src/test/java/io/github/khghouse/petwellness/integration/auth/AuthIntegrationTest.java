@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -140,6 +141,20 @@ class AuthIntegrationTest extends IntegrationTestSupport {
     @Test
     void getMyPets_withoutAccessToken_returnsTokenMissing() throws Exception {
         mockMvc.perform(get("/api/v1/pets"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("TOKEN_MISSING"));
+    }
+
+    @DisplayName("Access Token이 없으면 반려견 정보 수정에 실패한다")
+    @Test
+    void updatePetInformation_withoutAccessToken_returnsTokenMissing() throws Exception {
+        mockMvc.perform(
+                        put("/api/v1/pets/{petId}", 1L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
+                                        {"name":"보리","birthDate":"2023-01-01","gender":"MALE","breedId":1,"neuteredStatus":"NOT_NEUTERED"}
+                                        """))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.error.code").value("TOKEN_MISSING"));
     }
